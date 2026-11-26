@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ebe8e3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.png">
+<title>เช็คลิสต์หน้างาน</title>
+<meta name="apple-mobile-web-app-title" content="เช็คลิสต์">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --bg:#f5f4f0; --card:#fff; --ink:#1d2321; --sub:#6b726f; --line:#e6e3dc;
+    --accent:#1f6f5c; --accent-soft:#e3f1ec;
+    --red:#c93c3c; --red-soft:#fbe9e7; --orange:#c7701a; --orange-soft:#fdf0e1;
+    --yellow:#9a7b0a; --yellow-soft:#fbf5d9; --gray:#7a6f8f; --gray-soft:#efecf5;
+    --r:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Sukhumvit Set","Noto Sans Thai","Segoe UI",sans-serif;font-size:16px;line-height:1.45}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer}
+  .wrap{max-width:720px;margin:0 auto;padding:12px 12px 90px}
+
+  header{display:flex;align-items:center;gap:10px;padding:6px 2px 12px}
+  header h1{font-size:21px;margin:0;flex:1;letter-spacing:-.2px}
+  header .date{font-size:13px;color:var(--sub);font-weight:500}
+  .icon-btn{border:0;background:var(--card);width:40px;height:40px;border-radius:12px;font-size:19px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .stat{background:var(--card);border-radius:12px;padding:8px 6px;text-align:center;border:2px solid transparent}
+  .stat b{display:block;font-size:20px;line-height:1.1}
+  .stat span{font-size:12px;color:var(--sub)}
+  .stat.red b{color:var(--red)} .stat.orange b{color:var(--orange)} .stat.gray b{color:var(--gray)} .stat.green b{color:var(--accent)}
+  .stat.on{border-color:currentColor}
+  .stat.red.on{border-color:var(--red)} .stat.orange.on{border-color:var(--orange)} .stat.gray.on{border-color:var(--gray)} .stat.green.on{border-color:var(--accent)}
+
+  .composer{background:var(--card);border-radius:var(--r);padding:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .composer textarea{width:100%;border:0;resize:none;min-height:46px;max-height:200px;outline:none;background:transparent;padding:4px}
+  .composer .row{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .thumbs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .thumb{position:relative;width:48px;height:48px;border-radius:8px;overflow:hidden;background:#ddd}
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .thumb button{position:absolute;top:0;right:0;border:0;background:rgba(0,0,0,.55);color:#fff;width:20px;height:20px;font-size:12px;border-radius:0 0 0 8px;padding:0}
+  .btn{border:0;border-radius:11px;padding:9px 14px;font-weight:600;background:var(--accent-soft);color:var(--accent)}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.danger{background:var(--red-soft);color:var(--red)}
+  .btn:disabled{opacity:.5}
+  .btn.ghost{background:transparent;color:var(--sub);font-weight:500}
+
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:14px;white-space:nowrap}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .card{background:var(--card);border-radius:var(--r);margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:5px solid var(--line);overflow:hidden}
+  .card.overdue{border-left-color:var(--red)} .card.today{border-left-color:var(--orange)}
+  .card.tomorrow{border-left-color:#e2c23b} .card.upcoming{border-left-color:var(--accent)}
+  .card.blocked{opacity:.72} .card.done{opacity:.6}
+  .card-head{padding:11px 12px 4px;display:flex;gap:8px;align-items:flex-start}
+  .card-title{flex:1;font-weight:700;font-size:16.5px}
+  .card.done .card-title{text-decoration:line-through}
+  .prog{font-size:13px;color:var(--sub);font-weight:600;white-space:nowrap;padding-top:2px}
+  .badges{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 4px}
+  .badge{font-size:12.5px;border-radius:7px;padding:1px 8px;font-weight:600}
+  .b-overdue{background:var(--red-soft);color:var(--red)} .b-today{background:var(--orange-soft);color:var(--orange)}
+  .b-tomorrow{background:var(--yellow-soft);color:var(--yellow)} .b-upcoming{background:var(--accent-soft);color:var(--accent)}
+  .b-none{background:#f1f0ec;color:var(--sub)} .b-silent{background:var(--gray-soft);color:var(--gray)}
+  .b-blocked{background:#f1f0ec;color:var(--sub)}
+
+  ul.steps{list-style:none;margin:0;padding:2px 4px 2px}
+  .step{display:flex;align-items:flex-start;gap:4px;border-radius:10px}
+  .step label{flex:1;display:flex;gap:10px;align-items:flex-start;padding:7px 8px;cursor:pointer}
+  .step input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;border:2px solid #bfc5c2;border-radius:7px;margin:0;display:grid;place-content:center;background:#fff;transition:.15s}
+  .step input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+  .step input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .step .txt{flex:1;padding-top:1px}
+  .step.done .txt{color:var(--sub);text-decoration:line-through}
+  .who{display:inline-block;font-size:12px;background:#eef0ff;color:#4450a8;border-radius:6px;padding:0 6px;margin-left:4px;font-weight:600;text-decoration:none}
+  .step .edit{border:0;background:none;color:#b3b8b5;padding:8px 8px;font-size:15px}
+
+  .card-foot{display:flex;gap:6px;align-items:center;padding:4px 10px 10px;flex-wrap:wrap}
+  .add-step{flex:1;min-width:150px;border:1px dashed var(--line);border-radius:10px;padding:7px 10px;background:#fbfaf8;outline:none}
+  .add-step:focus{border-style:solid;border-color:var(--accent)}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px;font-size:14px;color:var(--sub)}
+  .notes{margin:0 12px 10px;padding:8px 10px;background:#fbfaf3;border-radius:10px;font-size:14px;white-space:pre-wrap;color:#555}
+
+  .empty{text-align:center;color:var(--sub);padding:40px 10px}
+  .warn{background:var(--yellow-soft);color:#6d5807;border-radius:10px;padding:8px 10px;font-size:14px;margin-bottom:10px}
+
+  /* preview */
+  .pv{background:#fff;border:2px solid var(--accent);border-radius:var(--r);padding:10px;margin-bottom:14px}
+  .pv h3{margin:2px 2px 8px;font-size:16px}
+  .pv-card{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;background:#fcfcfa}
+  .pv-card.skip{opacity:.45}
+  .pv-card select,.pv-card input[type=text],.pv-card input[type=date]{width:100%;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:#fff;margin-bottom:6px}
+  .pv-row{display:flex;gap:6px;align-items:center}
+  .pv-row > *{margin-bottom:6px}
+  .pv-step input[type=text]{flex:1}
+  .pv-step select{width:120px;flex:none}
+  .pv-step .x{border:0;background:none;color:var(--red);font-size:18px;padding:0 4px}
+  .pv-src{font-size:12.5px;color:var(--sub);margin-top:2px}
+  .pv-done{display:flex;gap:8px;align-items:center;font-size:14.5px;padding:3px 2px}
+  .lbl{font-size:12.5px;color:var(--sub);margin:2px 2px 3px;font-weight:600}
+  .learn{font-size:12.5px;color:var(--accent);margin:-2px 2px 6px}
+
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(20,24,22,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+  .modal.hidden{display:none}
+  .sheet{background:#fff;width:100%;max-width:720px;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+  .sheet h2{margin:0 0 12px;font-size:18px}
+  .sheet .field{margin-bottom:12px}
+  .sheet .field label{display:block;font-size:13px;color:var(--sub);margin-bottom:4px;font-weight:600}
+  .sheet input,.sheet select,.sheet textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff}
+  .sheet .menu button{display:block;width:100%;text-align:left;border:0;background:#f7f6f3;border-radius:11px;padding:12px 14px;margin-bottom:8px;font-size:16px}
+  .sheet .menu button.red{color:var(--red)}
+  .hint{font-size:13px;color:var(--sub);margin-top:4px}
+  code{background:#f1f0ec;border-radius:6px;padding:2px 6px;font-size:13px;word-break:break-all}
+
+  #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d2321;color:#fff;padding:9px 16px;border-radius:12px;font-size:14.5px;opacity:0;transition:.25s;pointer-events:none;z-index:30;max-width:90vw;text-align:center}
+  #toast.show{opacity:1}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .loading{text-align:center;padding:60px;color:var(--sub)}
+
+  /* tabs */
+  .tabs{display:grid;grid-template-columns:1fr 1fr;background:#e9e7e1;border-radius:12px;padding:3px;margin-bottom:12px}
+  .tabs button{border:0;background:transparent;border-radius:10px;padding:8px;font-weight:600;color:var(--sub)}
+  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .tabs .dot{display:inline-block;min-width:18px;height:18px;border-radius:9px;background:var(--red);color:#fff;font-size:11.5px;line-height:18px;padding:0 5px;margin-left:4px;vertical-align:1px}
+
+  /* asks */
+  .asks{margin-bottom:12px}
+  .ask{background:#fff;border-radius:var(--r);padding:11px 12px;margin-bottom:8px;border:2px solid var(--orange);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .ask.end{border-color:var(--red)}
+  .ask .q{font-weight:700;margin-bottom:2px}
+  .ask .meta{font-size:13px;color:var(--sub);margin-bottom:8px}
+  .ask .wait{font-size:13px;color:var(--red);margin:-4px 0 8px;font-weight:600}
+  .ask .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .ask .acts .btn{padding:8px 12px;font-size:14.5px}
+
+  /* plan */
+  .pbar{height:9px;background:#e9e7e1;border-radius:6px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--accent);border-radius:6px}
+  .overall{background:#fff;border-radius:var(--r);padding:12px;margin-bottom:12px}
+  .overall .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .overall b{font-size:24px}
+  .cal{background:#fff;border-radius:var(--r);padding:10px 8px;margin-bottom:12px}
+  .cal h4{margin:4px 4px 8px;font-size:15px}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-h{font-size:11.5px;color:var(--sub);text-align:center;padding-bottom:2px}
+  .cal-d{min-height:52px;border-radius:8px;background:#f7f6f2;padding:3px 3px;font-size:12px;border:2px solid transparent;text-align:left;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+  .cal-d.off{background:transparent;color:#bbb}
+  .cal-d.blank{background:transparent;border:0}
+  .cal-d.today{border-color:var(--orange)}
+  .cal-d.sel{background:var(--ink);color:#fff}
+  .cal-d .n{font-weight:700;font-size:12.5px}
+  .cal-d .e{font-size:12px;line-height:1.15;letter-spacing:-1px;word-break:break-all}
+  .cal-d.late .n{color:var(--red)} .cal-d.sel.late .n{color:#ffb4b4}
+  .dayhead{font-weight:700;margin:2px 2px 8px;font-size:15.5px}
+  .task{display:flex;gap:10px;align-items:flex-start;padding:9px 4px;border-top:1px solid #f0eee9}
+  .task:first-child{border-top:0}
+  .task .tn{flex:1}
+  .task .tn small{display:block;color:var(--sub);font-size:12.5px}
+  .st{font-size:12px;border-radius:7px;padding:2px 7px;font-weight:700;white-space:nowrap}
+  .st-done{background:var(--accent-soft);color:var(--accent)} .st-doing{background:#e7efff;color:#2f5fb3}
+  .st-overdue{background:var(--red-soft);color:var(--red)} .st-ending{background:var(--orange-soft);color:var(--orange)}
+  .st-todo{background:#f1f0ec;color:var(--sub)}
+  .catcard{background:#fff;border-radius:var(--r);padding:11px 12px;margin-bottom:8px}
+  .catcard summary{list-style:none;cursor:pointer}
+  .catcard summary::-webkit-details-marker{display:none}
+  .catcard .ch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:8px}
+  .catcard .ch b{font-size:15.5px}
+  .catcard .ch span{font-size:12.5px;color:var(--sub);white-space:nowrap}
+  .box{background:#fff;border-radius:var(--r);padding:10px 12px;margin-bottom:12px}
+  .projbar{display:flex;gap:6px;overflow-x:auto;margin:-4px 0 10px;scrollbar-width:none}
+  .projbar::-webkit-scrollbar{display:none}
+  .pchip{flex:none;border:0;background:#e9e7e1;border-radius:999px;padding:6px 13px;font-size:14px;font-weight:600;color:var(--sub);white-space:nowrap}
+  .pchip.on{background:var(--accent);color:#fff}
+  .ptag{font-size:11.5px;background:#e9e7e1;color:var(--sub);border-radius:6px;padding:1px 6px;margin-right:6px;font-weight:600;vertical-align:1px}
+
+  /* ================= ดีไซน์ 1 — Warm Mono ================= */
+  :root{
+    --bg:#ebe8e3; --card:#f6f4f1; --ink:#1a1917; --sub:#6b6760; --line:#dedad3; --mute:#d3cec6;
+    --accent:#1a1917; --accent-soft:#e2ded7;
+    --orange:#c24e0e; --orange-soft:#fbe6d8; --hot:#f26a1b;
+    --red:#b8321f; --red-soft:#f6ddd6;
+    --yellow:#8a6a12; --yellow-soft:#f3ead0; --gray:#6b6760; --gray-soft:#e2ded7;
+    --r:26px; --sh:0 1px 0 rgba(255,255,255,.9) inset, 0 10px 24px rgba(60,50,40,.08);
+    --mono:'JetBrains Mono',ui-monospace,monospace; --num:'Inter',sans-serif;
+  }
+  html,body{background:var(--bg);font-family:'IBM Plex Sans Thai','Inter',-apple-system,sans-serif;color:var(--ink)}
+  .wrap{max-width:480px;padding:22px 20px 130px}
+  svg{display:block}
+  /* top bar */
+  header.top{display:flex;align-items:center;gap:10px;padding:0}
+  body.tab-plan header.top{display:none}
+  .projpill{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px 0 6px;border:0;border-radius:999px;background:var(--card);
+    box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 16px rgba(60,50,40,.08);font:600 14px 'IBM Plex Sans Thai',sans-serif;max-width:62%}
+  .projpill .av{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 13px var(--num);flex:none}
+  .projpill #projName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .icon-btn{width:44px;height:44px;border-radius:50%;border:0;background:var(--card);box-shadow:0 6px 16px rgba(60,50,40,.08);display:grid;place-items:center;padding:0}
+  /* hero date */
+  .hero{display:flex;align-items:flex-end;justify-content:space-between;margin-top:18px}
+  .bigd{font:800 104px/.86 var(--num);letter-spacing:-6px}
+  .hm{text-align:right;padding-bottom:6px}
+  .hm b{display:block;font:700 20px/1.2 'IBM Plex Sans Thai',sans-serif}
+  .hm span{display:block;font:500 15px/1.4 'IBM Plex Sans Thai',sans-serif;color:var(--sub)}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:20px 0 0}
+  .stat{background:var(--card);border-radius:18px;padding:10px 10px 9px;text-align:left;border:0;box-shadow:0 6px 16px rgba(60,50,40,.06)}
+  .stat b{display:block;font:700 22px/1 var(--num);color:var(--ink)}
+  .stat span{display:block;font:500 11px/1.3 var(--mono);color:var(--sub);margin-top:6px;white-space:nowrap}
+  .stat.orange b{color:var(--orange)} .stat.red b{color:var(--red)}
+  .stat.green{background:var(--ink);box-shadow:none} .stat.green b{color:#fff} .stat.green span{color:#c9c5be}
+  .stat.on{outline:2px solid var(--hot);outline-offset:-2px}
+  /* plan banner */
+  .asks{margin:0}
+  .banner{display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;padding:12px 14px;border:0;border-radius:20px;background:var(--ink);color:#fff;text-align:left}
+  .banner .bd{width:10px;height:10px;border-radius:50%;background:var(--hot);flex:none}
+  .banner .bt{flex:1;min-width:0}
+  .banner b{display:block;font:600 14px/1.3 'IBM Plex Sans Thai',sans-serif}
+  .banner small{display:block;font:400 12px/1.4 'IBM Plex Sans Thai',sans-serif;color:#c9c5be;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* composer */
+  .composer{margin-top:12px;background:var(--card);border-radius:28px;padding:6px;box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 16px rgba(60,50,40,.07)}
+  .crow{display:flex;align-items:flex-end;gap:4px}
+  .composer textarea{flex:1;min-width:0;border:0;outline:none;background:transparent;resize:none;padding:10px 4px 10px 12px;min-height:40px;max-height:200px;font:400 14px/1.45 'IBM Plex Sans Thai',sans-serif}
+  .cbtn{width:40px;height:40px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;flex:none;padding:0;color:#fff}
+  .cbtn.go{background:var(--orange)}
+  .cbtn:disabled{opacity:.6}
+  .thumbs{display:flex;gap:6px;flex-wrap:wrap;padding:0 8px}
+  .thumbs:not(:empty){padding:4px 8px 6px}
+  /* section head + chips */
+  .sechead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 2px 10px}
+  .sechead > b{font:700 18px 'IBM Plex Sans Thai',sans-serif;flex:none}
+  .chips{display:flex;gap:6px;overflow-x:auto;padding:0;scrollbar-width:none;min-width:0}
+  .chip{flex:none;border:0;border-radius:999px;padding:4px 11px;background:#dedad3;color:#3d3a35;font:500 12px 'IBM Plex Sans Thai',sans-serif}
+  .chip.on{background:var(--ink);color:#fff}
+  /* cards */
+  .card{background:var(--card);border-radius:26px;border:0;box-shadow:var(--sh);margin-bottom:10px;padding:16px 16px 12px;overflow:visible}
+  .card.blocked{opacity:.75} .card.done{opacity:.7}
+  .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:0}
+  .card-title{font:600 16px/1.35 'IBM Plex Sans Thai',sans-serif}
+  .card.done .card-title{text-decoration:none;color:#8a857d}
+  .cright{display:flex;align-items:center;gap:6px;flex:none}
+  .pdots{display:flex;gap:4px;padding-top:6px}
+  .pdots i{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+  .pdots i.on{background:var(--ink)}
+  .more{border:0;background:transparent;color:#9a958d;font-size:18px;line-height:1;padding:2px 2px 0;margin-top:-2px}
+  .dline{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:4px;font:500 12px var(--mono);color:var(--sub)}
+  .dl{border:0;background:transparent;padding:0;font:inherit;color:inherit;display:inline-flex;align-items:center;gap:6px}
+  .dl.hot{color:var(--orange)}
+  .dl.hot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--hot)}
+  .dl.red{color:var(--red)}
+  .dl.red::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red)}
+  .xtag{color:#8a857d}
+  ul.steps{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+  .step{display:flex;align-items:center;gap:4px}
+  .step label{flex:1;display:flex;align-items:center;gap:12px;min-height:44px;padding:0;cursor:pointer}
+  .step input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:26px;height:26px;margin:0;border-radius:50%;border:2px solid #b9b3aa;background:#fff;display:grid;place-content:center}
+  .step input[type=checkbox]:checked{background:var(--ink);border-color:var(--ink)}
+  .step input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+  .step .txt{flex:1;font:400 15px/1.4 'IBM Plex Sans Thai',sans-serif;padding:0}
+  .step.done .txt{color:#8a857d;text-decoration:line-through}
+  .who{flex:none;margin-left:6px;padding:3px 9px;border-radius:999px;background:#e7e3dc;font:500 12px 'IBM Plex Sans Thai',sans-serif;color:#3d3a35}
+  .step .edit{border:0;background:none;color:#c4bfb7;padding:6px 2px 6px 6px;font-size:14px}
+  .notes{margin:6px 0 0;padding:10px 12px;background:var(--bg);border-radius:14px;font-size:13.5px;white-space:pre-wrap;color:#555}
+  .upd{display:flex;align-items:center;gap:8px;margin-top:6px;height:40px;padding:0 12px;border-radius:14px;background:var(--bg)}
+  .upd .add-step{flex:1;min-width:0;border:0;background:transparent;outline:none;padding:0;font:400 13px 'IBM Plex Sans Thai',sans-serif;color:var(--ink)}
+  .upd .add-step::placeholder{color:var(--sub)}
+  .empty{color:var(--sub)}
+  /* buttons, sheets */
+  .btn{border:0;border-radius:999px;padding:10px 16px;font-weight:600;background:#e2ded7;color:var(--ink)}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.danger{background:var(--red-soft);color:var(--red)}
+  .btn.ghost{background:transparent;color:var(--sub)}
+  .mini{border:0;background:var(--bg);border-radius:999px;color:var(--sub)}
+  .warn{background:var(--yellow-soft);border-radius:16px}
+  .pv{background:var(--card);border:2px solid var(--ink);border-radius:26px;padding:14px}
+  .pv-card{background:#fff;border-color:var(--line);border-radius:18px}
+  .pv-card select,.pv-card input[type=text],.pv-card input[type=date]{border-radius:12px}
+  .learn{color:var(--orange)}
+  .modal{background:rgba(26,25,23,.4)}
+  .sheet{background:var(--card);border-radius:28px 28px 0 0}
+  .sheet .menu button{background:#fff;border-radius:16px}
+  .sheet input,.sheet select,.sheet textarea{border-radius:14px;border-color:var(--line)}
+  .slist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .slist button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:#fff;border-radius:16px;padding:12px 14px;font-size:16px}
+  .slist button.on{background:var(--ink);color:#fff}
+  #toast{background:var(--ink);border-radius:999px;bottom:calc(100px + env(safe-area-inset-bottom))}
+  /* bottom nav */
+  .nav{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom));z-index:15;display:flex;justify-content:center;pointer-events:none}
+  .navin{display:flex;align-items:center;gap:12px;width:min(440px,calc(100% - 40px));pointer-events:auto}
+  .navpill{flex:1;display:flex;justify-content:space-around;align-items:center;height:62px;border-radius:999px;background:var(--card);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 12px 28px rgba(60,50,40,.16)}
+  .nb{width:46px;height:46px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;position:relative;padding:0;color:var(--sub)}
+  .nb.on{background:var(--ink);color:#fff}
+  .nb .ndot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--hot);border:2px solid var(--card)}
+  .nb.on .ndot{border-color:var(--ink)}
+  .fab{width:62px;height:62px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:grid;place-items:center;flex:none;box-shadow:0 12px 28px rgba(26,25,23,.3);padding:0}
+  /* ===== plan ===== */
+  .ph{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .ph h2{margin:4px 0 0;font:700 26px/1.2 'IBM Plex Sans Thai',sans-serif}
+  .psub{border:0;background:none;padding:0;margin-top:4px;font:500 12px var(--mono);color:var(--sub);text-align:left}
+  .fabsm{width:44px;height:44px;border-radius:50%;border:0;background:var(--ink);color:#fff;display:grid;place-items:center;flex:none;padding:0}
+  .pct{display:flex;align-items:flex-end;gap:16px;margin-top:18px}
+  .pct .big{font:800 86px/.86 var(--num);letter-spacing:-5px;flex:none}
+  .pct .big small{font-size:44px;letter-spacing:-2px}
+  .pct .pr{flex:1;min-width:0;padding-bottom:6px}
+  .pct .pl{display:flex;justify-content:space-between;font:500 12px var(--mono);color:var(--sub);margin-bottom:8px}
+  .segs{display:flex;gap:4px}
+  .segs i{flex:1;height:18px;border-radius:5px;background:#dad6cf}
+  .segs i.on{background:var(--ink)} .segs i.cur{background:var(--hot)}
+  .calbox{background:var(--card);border-radius:28px;padding:16px 14px 14px;margin-top:22px;box-shadow:var(--sh)}
+  .cgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px 6px;justify-items:center}
+  .ch7{font:500 12px 'IBM Plex Sans Thai',sans-serif;color:var(--sub);padding-bottom:4px}
+  .ch7.now{color:var(--orange)}
+  .cd{width:100%;max-width:42px;aspect-ratio:1;border-radius:50%;border:0;display:grid;place-items:center;font:600 13px var(--num);padding:0;position:relative;background:#d8d3cb;color:var(--ink)}
+  .cd.past{background:var(--ink);color:#fff}
+  .cd.today{background:var(--hot);color:#fff}
+  .cd.off{background:transparent;box-shadow:inset 0 0 0 2px #d3cec6;color:#9a958d}
+  .cd.out{background:transparent;box-shadow:none;border:2px dashed #cfcac2;color:#b5b0a8}
+  .cd.free{background:#ebe7e1;color:#8a857d}
+  .cd.late{box-shadow:inset 0 0 0 2px var(--red)}
+  .cd.end{background:var(--ink);color:var(--hot);box-shadow:0 0 0 3px var(--hot)}
+  .cd.sel{outline:3px solid var(--hot);outline-offset:2px}
+  .cd small{position:absolute;bottom:-1px;font:500 8.5px var(--mono);color:inherit;opacity:.8}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font:500 12px 'IBM Plex Sans Thai',sans-serif;color:var(--sub)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:50%;background:#d8d3cb}
+  .legend i.k{background:var(--ink)} .legend i.o{background:var(--hot)} .legend i.r{background:transparent;box-shadow:inset 0 0 0 2px #d3cec6}
+  .calmore{display:block;margin:10px auto 0;border:0;background:none;color:var(--sub);font:500 12px var(--mono)}
+  .qcard{background:var(--ink);color:#fff;border-radius:28px;padding:18px 16px 16px;margin-top:12px}
+  .qcard .ql{display:flex;align-items:center;gap:8px;font:500 12px var(--mono);color:#f4a274}
+  .qcard .ql::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--hot)}
+  .qcard .qt{font:700 17px/1.35 'IBM Plex Sans Thai',sans-serif;margin-top:6px}
+  .qcard .qm{font:400 12.5px 'IBM Plex Sans Thai',sans-serif;color:#c9c5be;margin-top:2px}
+  .qcard .qw{font:500 12.5px 'IBM Plex Sans Thai',sans-serif;color:#ffb38a;margin-top:6px}
+  .qacts{display:flex;gap:8px;margin-top:14px}
+  .qb{flex:1;height:46px;border-radius:999px;border:1.5px solid rgba(255,255,255,.28);background:transparent;color:#fff;font:600 14px 'IBM Plex Sans Thai',sans-serif;padding:0 8px}
+  .qb.w{background:#fff;color:var(--ink);border-color:#fff}
+  .qb.c{flex:none;width:46px;display:grid;place-items:center;padding:0}
+  .daybox{background:var(--card);border-radius:24px;padding:14px 16px;margin-top:12px;box-shadow:var(--sh)}
+  .dayhead{font:700 15px 'IBM Plex Sans Thai',sans-serif;margin:0 0 4px}
+  .task{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .task:first-of-type{border-top:0}
+  .task .tn{flex:1;font:500 14px/1.35 'IBM Plex Sans Thai',sans-serif;min-width:0}
+  .task .tn small{display:block;color:var(--sub);font:400 12px/1.4 'IBM Plex Sans Thai',sans-serif;margin-top:1px}
+  .st{border-radius:999px;font:500 11px var(--mono);padding:3px 8px;white-space:nowrap}
+  .st-done{background:#e2ded7;color:var(--ink)} .st-doing,.st-ending{background:var(--orange-soft);color:var(--orange)}
+  .st-overdue{background:var(--red-soft);color:var(--red)} .st-todo{background:#ebe7e1;color:var(--sub)}
+  .cats{margin-top:18px}
+  .catrow{list-style:none}
+  .catrow summary{display:flex;align-items:center;gap:12px;padding:8px 0;cursor:pointer;list-style:none}
+  .catrow summary::-webkit-details-marker{display:none}
+  .cn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:600 13px var(--num);flex:none;box-shadow:inset 0 0 0 1.5px #cfcac2;color:var(--sub)}
+  .cn.on{background:var(--hot);color:#fff;box-shadow:none}
+  .cn.ok{background:var(--ink);color:#fff;box-shadow:none}
+  .cname{width:96px;flex:none;font:600 14px/1.3 'IBM Plex Sans Thai',sans-serif}
+  .csegs{flex:1;display:flex;gap:4px;min-width:0}
+  .csegs i{flex:1;max-width:36px;height:24px;border-radius:7px;background:#dad6cf}
+  .csegs i.d{background:var(--ink)} .csegs i.a{background:transparent;box-shadow:inset 0 0 0 2px var(--hot)}
+  .csegs i.l{background:transparent;box-shadow:inset 0 0 0 2px var(--red)}
+  .catrow .clist{background:var(--card);border-radius:20px;padding:4px 14px;margin:4px 0 10px;box-shadow:var(--sh)}
+  .projbar{display:none!important}
+  .stat.green.on{outline:none}
+  .qmore{display:block;width:100%;margin-top:10px;border:0;background:#e2ded7;border-radius:999px;padding:12px;font:600 14px 'IBM Plex Sans Thai',sans-serif;color:var(--ink)}
+  .plinks{display:flex;flex-direction:column;gap:6px;margin-top:16px}
+  .sheet::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:#d3cec6;margin:-4px auto 14px}
+  .uxh{display:flex;align-items:center;gap:10px}
+  .aitag{background:var(--ink);color:#fff;border-radius:999px;padding:5px 12px;font:500 12.5px var(--mono)}
+  .uxs{font:500 13px 'IBM Plex Sans Thai',sans-serif;color:var(--sub)}
+  .uxt{font:700 17px/1.3 'IBM Plex Sans Thai',sans-serif;margin-top:14px}
+  .uxq{font:400 13.5px 'IBM Plex Sans Thai',sans-serif;color:var(--sub);margin-top:2px}
+  .uxl{font:500 13px var(--mono);color:var(--sub);margin-top:18px}
+  .uxl b{color:var(--ink)}
+  .mv{display:flex;align-items:center;gap:14px;margin-top:6px}
+  .mvd b{display:block;font:800 60px/.95 var(--num);letter-spacing:-3px}
+  .mvd span{display:block;font:500 12px var(--mono);color:var(--sub);margin-top:4px}
+  .mvd span.hot{color:var(--orange)}
+  .mvd.old b{color:#bdb7ae;text-decoration:line-through;text-decoration-thickness:4px}
+  .irow{display:flex;gap:12px;align-items:flex-start;background:#ebe8e3;border-radius:18px;padding:12px 14px;margin-top:10px}
+  .irow .ii{width:24px;text-align:center;font:600 15px var(--num);color:var(--ink);flex:none;padding-top:1px}
+  .irow b{display:block;font:600 14px 'IBM Plex Sans Thai',sans-serif}
+  .irow span{display:block;font:400 13px/1.4 'IBM Plex Sans Thai',sans-serif;color:var(--sub)}
+  .uxb{display:flex;gap:10px;margin-top:20px}
+  .uxb .btn{height:52px;font-size:16px}
+  .uxb #uxEdit{flex:none;width:96px}
+  .uxb #pvSave{flex:1}
+  .newp{font:500 12.5px 'IBM Plex Sans Thai',sans-serif;color:var(--orange);margin:-2px 0 8px 2px}
+  .newp.ask{color:var(--ink);background:var(--orange-soft);border-radius:12px;padding:8px 10px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+  .newp .mini{background:#fff;color:var(--ink);padding:5px 10px}
+  /* ================= ดีไซน์ 3 — Silver Glass Prototype ================= */
+  :root{
+    --bg:#e7e9ec; --card:rgba(255,255,255,.40); --ink:#1d2127; --sub:#7d858f; --line:rgba(150,160,172,.28); --mute:rgba(150,160,172,.35);
+    --orange:#1d2127; --orange-soft:rgba(255,255,255,.55); --hot:#16b59a; --teal:#16b59a;
+    --red:#d2493a; --red-soft:rgba(255,190,180,.35);
+    --graphite:linear-gradient(180deg,#3a3f47,#15181c);
+    --chrome:linear-gradient(180deg,#1d2127 0%,#5d646e 60%,#a7adb5 100%);
+    --edge:1px solid rgba(255,255,255,.92);
+    --sh:inset 0 1px 1px rgba(255,255,255,.95), inset 0 -1px 2px rgba(140,150,165,.25), 0 0 0 .5px rgba(140,150,165,.35), 0 14px 34px rgba(40,50,70,.10);
+    --glow:0 10px 26px rgba(120,160,230,.28), 0 2px 6px rgba(40,50,70,.12);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  html,body{background:var(--bg);color:var(--ink)}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:radial-gradient(60% 40% at 80% 0%,rgba(255,255,255,.9),transparent 70%),
+               radial-gradient(50% 35% at 0% 60%,rgba(255,255,255,.7),transparent 70%),
+               linear-gradient(180deg,#eef0f2,#dcdfe3)}
+  /* กระจกฝ้าใส */
+  .card,.composer,.stat,.icon-btn,.projpill,.navpill,.calbox,.daybox,.catrow .clist,.pv,.pv-card,.sheet,.slist button,.chip,.btn,.mini,.qmore,.irow,.upd,.notes,#setup .sbox{
+    background:var(--card);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);
+    border:var(--edge);box-shadow:var(--sh);color:var(--ink)}
+  .card{border:var(--edge)!important;position:relative}
+  .upd,.notes,.irow{background:rgba(255,255,255,.32);box-shadow:inset 0 1px 2px rgba(140,150,165,.25)}
+  /* หมุดย้ำมุมการ์ด + รหัสต้นแบบ */
+  .card::before{content:"";position:absolute;inset:9px;pointer-events:none;border-radius:18px;
+    background:radial-gradient(circle,#9aa2ac 1.3px,transparent 1.8px) left top/8px 8px no-repeat,
+               radial-gradient(circle,#9aa2ac 1.3px,transparent 1.8px) right top/8px 8px no-repeat,
+               radial-gradient(circle,#9aa2ac 1.3px,transparent 1.8px) left bottom/8px 8px no-repeat,
+               radial-gradient(circle,#9aa2ac 1.3px,transparent 1.8px) right bottom/8px 8px no-repeat}
+  #list{counter-reset:tk}
+  .card{counter-increment:tk}
+  .card::after{content:"T-" counter(tk, decimal-leading-zero);position:absolute;right:18px;bottom:10px;font:500 9.5px var(--mono);letter-spacing:.12em;color:#a3aab3}
+  /* ปุ่มหลัก = กระจกหนาใส มีแสงฟ้าใต้ปุ่ม */
+  .btn.primary,.cbtn.go,#btnAnalyze,.fab,.fabsm,.aitag{
+    background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(214,220,228,.45));color:var(--ink);
+    border:1.5px solid rgba(255,255,255,.98);
+    box-shadow:inset 0 2px 3px #fff, inset 0 -4px 8px rgba(130,145,165,.30), var(--glow)}
+  .cbtn.go svg path,.fab svg path,.fabsm svg path{stroke:#1d2127}
+  /* สถานะเลือก = กราไฟต์ */
+  .chip.on,.nb.on,.projpill .av,.stat.green,.slist button.on{background:var(--graphite);color:#fff;border:1px solid rgba(255,255,255,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 18px rgba(20,24,30,.25)}
+  .stat.green b,.stat.green span{color:#fff}
+  .nb{color:#7d858f}.nb .ndot{background:var(--teal);border-color:#fff;box-shadow:0 0 8px rgba(22,181,154,.8)}
+  /* ตัวเลขใหญ่ = โครเมียม + ป้ายต้นแบบ */
+  .bigd,.pct .big{background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-7px}
+  .hero{position:relative;margin-top:34px}
+  .hero::before{content:"PROTOTYPE · SITE CHECKLIST";position:absolute;left:4px;top:-22px;font:500 10px var(--mono);letter-spacing:.22em;color:#8e959e}
+  .hm b{font-weight:600} .hm span{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .stat b{font-family:var(--num)} .stat span{letter-spacing:.06em;text-transform:uppercase}
+  .stat.red b{color:var(--red)} .stat.orange b{color:var(--teal)}
+  .sechead>b::before{content:"02 ";font:500 11px var(--mono);color:#8e959e;letter-spacing:.1em;vertical-align:3px}
+  /* แถบดำ/การ์ดคำถาม = กระจกกราไฟต์ */
+  .banner,.qcard,.ask{background:linear-gradient(160deg,rgba(40,45,52,.92),rgba(18,20,24,.94));color:#fff;border:1px solid rgba(255,255,255,.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 16px 34px rgba(20,24,30,.25)}
+  .banner .bd,.qcard .ql::before{background:var(--teal);box-shadow:0 0 10px rgba(22,181,154,.9)}
+  .qcard .ql{color:#7fe3cf} .banner small,.qcard .qm{color:#aab1ba} .qcard .qw{color:#ffd28a}
+  .qb{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08)}
+  .qb.w{background:linear-gradient(180deg,#fff,#dfe3e8);color:#1d2127;border-color:#fff}
+  /* เช็คบ็อกซ์ / ความคืบหน้า */
+  .step input[type=checkbox]{background:rgba(255,255,255,.65);border:1.5px solid #b9c0c8;box-shadow:inset 0 1px 2px rgba(120,130,145,.25)}
+  .step input[type=checkbox]:checked{background:var(--graphite);border-color:#15181c}
+  .step input[type=checkbox]:checked::after{border-color:#7fe3cf}
+  .pdots i{background:rgba(150,160,172,.35)} .pdots i.on{background:var(--teal);box-shadow:0 0 6px rgba(22,181,154,.7)}
+  .dl.hot,.dl.hot::before{color:var(--teal)} .dl.hot::before{background:var(--teal);box-shadow:0 0 6px rgba(22,181,154,.8)}
+  .who{background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.95);color:#4d545d;font-family:var(--mono);font-size:11px}
+  .segs i{background:rgba(150,160,172,.3)} .segs i.on{background:var(--graphite)} .segs i.cur{background:var(--teal);box-shadow:0 0 8px rgba(22,181,154,.7)}
+  /* ปฏิทิน */
+  .cd{background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.95);color:var(--ink);box-shadow:inset 0 -1px 2px rgba(140,150,165,.2)}
+  .cd.past{background:var(--graphite);color:#cfd4da;border-color:rgba(255,255,255,.2)}
+  .cd.today{background:rgba(255,255,255,.85);color:var(--ink);box-shadow:0 0 0 2px var(--teal),0 0 14px rgba(22,181,154,.55)}
+  .cd.free{background:rgba(255,255,255,.25);color:#a3aab3}
+  .cd.off{background:transparent;border:1px dashed #b9c0c8;box-shadow:none;color:#a3aab3}
+  .cd.end{background:var(--graphite);color:#7fe3cf;box-shadow:0 0 0 2px var(--teal)}
+  .cd.sel{outline:2px solid var(--ink)}
+  .ch7.now{color:var(--teal)}
+  .legend i.k{background:#2a2e35} .legend i.o{background:var(--teal)}
+  .cn.on{background:var(--teal);color:#fff;box-shadow:0 0 10px rgba(22,181,154,.5)} .cn.ok{background:var(--graphite)}
+  .csegs i{background:rgba(150,160,172,.3)} .csegs i.d{background:var(--graphite)} .csegs i.a{background:rgba(255,255,255,.5);box-shadow:inset 0 0 0 1.5px var(--teal)}
+  .st-done{background:rgba(29,33,39,.08);color:var(--ink)} .st-doing,.st-ending{background:rgba(22,181,154,.12);color:#0e8a75}
+  .modal{background:rgba(30,35,42,.18);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  #toast{background:rgba(25,28,33,.85);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .mvd:not(.old) b{background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat.on{border-color:rgba(29,33,39,.4)} .stat.green.on{outline:none}
+  .card{padding-bottom:24px}
+  #setup{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:24px}
+  #setup .sbox{width:min(380px,100%);background:var(--card);border-radius:28px;padding:24px;box-shadow:var(--sh);text-align:center}
+  #setup .slogo img{width:72px;height:72px;border-radius:18px}
+  #setup h2{margin:12px 0 6px;font:700 22px 'IBM Plex Sans Thai',sans-serif}
+  #setup p{color:var(--sub);font-size:14px;line-height:1.5;margin:0 0 14px}
+  #setup input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:15px}
+  @media (display-mode: standalone){ .wrap{padding-top:calc(22px + env(safe-area-inset-top))} }
+</style>
+
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <button class="projpill" id="projPill"><span class="av" id="projAv">•</span><span id="projName">โปรเจกต์</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1917" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    <span style="flex:1"></span>
+    <button class="icon-btn" id="btnRefresh" aria-label="รีเฟรช"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a1917" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
+    <button class="icon-btn" id="btnSettings" aria-label="ตั้งค่า"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1917" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+  </header>
+  <div class="projbar" id="projbar" hidden></div>
+  <div id="planView" hidden></div>
+  <div id="checkView">
+    <div class="hero" id="hdate"></div>
+    <div class="stats" id="stats"></div>
+    <div class="asks" id="asks"></div>
+    <div class="composer">
+      <div class="crow">
+        <textarea id="inText" rows="1" placeholder="พิมพ์งานใหม่ หรือแนบรูปแคปแชท"></textarea>
+        <input type="file" id="inFile" accept="image/*" multiple hidden>
+        <button class="cbtn" id="btnImg" aria-label="แนบรูป"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6760" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5 12.6 21a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/></svg></button>
+        <button class="cbtn go" id="btnAnalyze" aria-label="วิเคราะห์ด้วย AI"></button>
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div id="preview"></div>
+    <div class="sechead"><b>ต้องทำต่อ</b><div class="chips" id="chips"></div></div>
+    <div id="list"><div class="loading"><span class="spin"></span>กำลังโหลด…</div></div>
+  </div>
+</div>
+<nav class="nav" id="tabs"></nav>
+
+<div class="modal hidden" id="modal"><div class="sheet" id="sheet"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ================= state ================= */
+const S = { data:null, tab:'check', selDay:'', filter:'active', person:'', images:[], preview:null, pvWarn:'', pvSource:'', busy:false, notesOpen:{} };
+try{ S.tab = localStorage.getItem('tab') || 'check'; S.project = localStorage.getItem('proj') || ''; }catch(e){ S.project=''; }
+const $ = id => document.getElementById(id);
+const DOW = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
+const MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbx1IpxtHP7xvEHip8BGBSunbaBf1O47fZnEsBB-YvoTWFwASQaqstpjtb9YFkjaLl9Y/exec';
+function apiKey(){ try{ return localStorage.getItem('k') || ''; }catch(e){ return ''; } }
+async function call(fn, ...args){
+  const k = apiKey();
+  if (!k){ showSetup(); throw new Error('ยังไม่ได้เชื่อมต่อแอป'); }
+  let r;
+  try{
+    r = await fetch(API_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify({ token:k, fn, args }) });
+  }catch(e){ throw new Error('ต่อเน็ตไม่ได้ ลองใหม่อีกครั้ง'); }
+  let j; try{ j = await r.json(); }catch(e){ throw new Error('เซิร์ฟเวอร์ตอบกลับผิดรูปแบบ'); }
+  if (!j.ok){ if (/รหัสเชื่อมต่อ/.test(j.error||'')){ try{localStorage.removeItem('k');}catch(e){} showSetup(j.error); } throw new Error(j.error || 'เกิดข้อผิดพลาด'); }
+  return j.data;
+}
+/* หน้าเชื่อมต่อครั้งแรก: เปิดลิงก์ติดตั้ง (#k=...) หรือวางรหัส */
+function takeHashKey(){ const m = location.hash.match(/k=([A-Za-z0-9]+)/); if (!m) return false; try{ localStorage.setItem('k', m[1]); }catch(e){} history.replaceState(null,'',location.pathname); const s=document.getElementById('setup'); if (s) s.remove(); return true; }
+takeHashKey();
+window.addEventListener('hashchange', () => { if (takeHashKey()) load(); });
+function showSetup(msg){
+  if (document.getElementById('setup')) return;
+  const d = document.createElement('div'); d.id='setup';
+  d.innerHTML = `<div class="sbox"><div class="slogo"><img src="icon-192.png" alt=""></div><h2>เชื่อมต่อแอป</h2>
+    <p>${msg ? esc(msg)+'<br>' : ''}เปิดแอปเดิมใน Google → ตั้งค่า → คัดลอก <b>ลิงก์ติดตั้งแอป</b> แล้ววางที่นี่ (ทำครั้งเดียวต่อเครื่อง)</p>
+    <input id="setupIn" placeholder="วางลิงก์หรือรหัสเชื่อมต่อ" autocomplete="off">
+    <button class="btn primary" id="setupGo" style="width:100%;margin-top:10px">เชื่อมต่อ</button></div>`;
+  document.body.appendChild(d);
+  document.getElementById('setupGo').onclick = () => {
+    const v = document.getElementById('setupIn').value.trim(); const m = v.match(/k=([A-Za-z0-9]+)/) || v.match(/^([A-Za-z0-9]{20,})$/);
+    if (!m){ toast('รหัสไม่ถูกต้อง'); return; }
+    try{ localStorage.setItem('k', m[1]); }catch(e){}
+    d.remove(); load();
+  };
+}
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, ms){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), ms||2200); }
+const IC = {
+  spark:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+  check:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m4 7 2 2 3-3M4 16l2 2 3-3M13 8h7M13 17h7"/></svg>',
+  cal:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  calS:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  person:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5"/></svg>',
+  plus:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  plusS:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  arrow:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>',
+  pen:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b6760" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+};
+const FULLM=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const FULLD=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+function fail(e){ toast('⚠️ ' + (e && e.message ? e.message : e), 4000); }
+
+function ymdUTC(y,m,d){ return new Date(Date.UTC(y,m-1,d)).toISOString().slice(0,10); }
+function addDays(ymd,n){ const p=ymd.split('-').map(Number); return ymdUTC(p[0],p[1],p[2]+n); }
+function dow(ymd){ const p=ymd.split('-').map(Number); return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay(); }
+function thai(ymd, withDow){ if(!ymd) return ''; const p=ymd.split('-').map(Number); return (withDow? DOW[dow(ymd)]+' ':'') + p[2]+' '+MON[p[1]-1]; }
+
+let seq = 0, pending = 0;
+async function run(fn, ...args){
+  const my = ++seq; pending++;
+  try{
+    const d = await call(fn, ...args); pending--;
+    if (d && d.topics && my === seq) { S.data = d; render(); }
+    return d;
+  }catch(e){ pending--; fail(e); load(); }
+}
+async function load(){
+  const my = seq;
+  try{ const d = await call('getData'); if (pending>0 || my!==seq) return; S.data = d; render(); }
+  catch(e){ $('list').innerHTML = '<div class="empty">โหลดไม่สำเร็จ<br><small>'+esc(e.message||e)+'</small></div>'; }
+}
+
+/* ================= projects ================= */
+function projects(){ return (S.data.projects||[]).filter(p=>p.archived!=='1').sort((a,b)=>Number(a.order)-Number(b.order)); }
+function curProject(){ const ps=projects(); if (S.project==='all' && ps.length>1) return ''; return ps.find(p=>p.id===S.project) ? S.project : (ps[0] ? ps[0].id : ''); }
+function projName(id){ const p=(S.data.projects||[]).find(x=>x.id===id); return p ? p.name : ''; }
+function renderProjects(){
+  const ps = projects(), cur = curProject();
+  const nm = cur ? projName(cur) : 'ทุกโปรเจกต์';
+  $('projName').textContent = nm; $('projAv').textContent = (nm.replace(/^คุณ/,'').trim()[0]||'•');
+  $('projbar').innerHTML = ps.map(p => `<button class="pchip ${cur===p.id?'on':''}" data-proj="${p.id}">🏠 ${esc(p.name)}</button>`).join('') +
+    (ps.length>1 ? `<button class="pchip ${cur===''?'on':''}" data-proj="all">ทั้งหมด</button>` : '') +
+    (cur ? `<button class="pchip" data-projedit="${cur}">✎</button>` : '') +
+    `<button class="pchip" data-projnew="1">➕ โปรเจกต์ใหม่</button>`;
+}
+function projSheet(){
+  const ps = projects(), cur = curProject();
+  openSheet(`<h2>โปรเจกต์</h2><div class="slist">
+    ${ps.map(p=>`<button class="${cur===p.id?'on':''}" data-proj="${p.id}">🏠 ${esc(p.name)}</button>`).join('')}
+    ${ps.length>1?`<button class="${cur===''?'on':''}" data-proj="all">ทุกโปรเจกต์</button>`:''}
+    ${cur?`<button data-projedit="${cur}">✎ แก้ชื่อ / ปิดโปรเจกต์นี้</button>`:''}
+    <button data-projnew="1">➕ โปรเจกต์ใหม่</button></div>
+    <button class="btn ghost" style="width:100%" onclick="closeSheet()">ปิด</button>`);
+}
+function peopleSheet(){
+  const people = [...new Set(S.data.contacts)];
+  openSheet(`<h2>ผู้ประสานงาน</h2><div class="hint" style="margin:-6px 0 10px">แตะชื่อเพื่อดูเฉพาะงานที่รอคนนั้น</div><div class="slist">
+    <button class="${!S.person?'on':''}" data-person="">ทุกคน</button>
+    ${people.map(p=>`<button class="${S.person===p?'on':''}" data-person="${esc(p)}">👤 ${esc(p)}</button>`).join('')}</div>
+    <button class="btn ghost" style="width:100%" onclick="closeSheet()">ปิด</button>`);
+}
+$('projPill').onclick = projSheet;
+function setProject(id){ S.project = id; S.selDay=''; try{ localStorage.setItem('proj', id); }catch(e){} render(); }
+document.addEventListener('click', async e => {
+  const t = e.target.closest('[data-proj],[data-projnew],[data-projedit]'); if (!t) return;
+  if (t.closest('#sheet')) closeSheet();
+  if (t.dataset.proj) setProject(t.dataset.proj);
+  else if (t.dataset.projnew){
+    const n = (prompt('ชื่อโปรเจกต์ใหม่ (เช่น ชื่อลูกค้า)') || '').trim(); if (!n) return;
+    const d = await run('addProject', n);
+    if (d){ const p = d.projects.filter(x=>x.name===n).pop(); if (p) setProject(p.id); toast('สร้างโปรเจกต์แล้ว ✓'); }
+  } else if (t.dataset.projedit){
+    const id = t.dataset.projedit, old = projName(id);
+    const n = prompt('แก้ชื่อโปรเจกต์ (เว้นว่าง = ไม่แก้)\nพิมพ์ "ปิด" เพื่อซ่อนโปรเจกต์ที่จบแล้ว', old);
+    if (n === null) return;
+    if (n.trim() === 'ปิด'){ if (confirm('ซ่อนโปรเจกต์ "'+old+'"? (ข้อมูลยังอยู่ใน Google Sheet)')) { S.project=''; run('updateProject', id, {archived:true}); } }
+    else if (n.trim() && n.trim()!==old) run('updateProject', id, {name:n.trim()});
+  }
+});
+
+/* ================= derive ================= */
+function derive(){
+  const d = S.data, today = d.today, tomorrow = addDays(today,1);
+  const tmap = {}; d.topics.forEach(t => tmap[t.id] = t);
+  const pid = curProject();
+  const by = {}; d.steps.forEach(s => (by[s.topicId] = by[s.topicId] || []).push(s));
+  Object.values(by).forEach(a => a.sort((x,y) => Number(x.order)-Number(y.order)));
+  return d.topics.filter(t => !pid || t.projectId===pid).map(t => {
+    const steps = by[t.id] || [];
+    const done = t.status === 'done';
+    const dep = t.dependsOn ? tmap[t.dependsOn] : null;
+    const blocked = !done && !!dep && dep.status !== 'done';
+    let ds = 'none';
+    if (t.date) ds = t.date < today ? 'overdue' : t.date === today ? 'today' : t.date === tomorrow ? 'tomorrow' : 'upcoming';
+    const upd = Date.parse(t.updatedAt || t.createdAt);
+    const silentH = isNaN(upd) ? 0 : (d.now - upd) / 3600000;
+    const silent = !done && !blocked && silentH >= d.silentHours;
+    const contacts = [...new Set(steps.map(s => s.contact).filter(Boolean))];
+    const pendingContacts = [...new Set(steps.filter(s => s.done!=='1').map(s => s.contact).filter(Boolean))];
+    return { t, steps, done, dep, blocked, ds, silent, silentDays: Math.floor(silentH/24), contacts, pendingContacts,
+      doneCount: steps.filter(s => s.done==='1').length };
+  });
+}
+const RANK = { overdue:0, today:1, tomorrow:2, upcoming:3, none:4 };
+
+/* ================= render ================= */
+function render(){
+  if (!S.data) return;
+  renderProjects();
+  const all = derive();
+  const act = all.filter(x => !x.done);
+  { const p=S.data.today.split('-').map(Number);
+    $('hdate').innerHTML = `<div class="bigd">${p[2]}</div><div class="hm"><b>${FULLM[p[1]-1]}</b><span>${FULLD[dow(S.data.today)]} · ${p[0]+543}</span></div>`; }
+
+  const n = {
+    overdue: act.filter(x => x.ds==='overdue' && !x.blocked).length,
+    today: act.filter(x => x.ds==='today' && !x.blocked).length,
+    silent: act.filter(x => x.silent).length,
+    active: act.length,
+  };
+  $('stats').innerHTML = [
+    ['overdue','red','เลยกำหนด'],['today','orange','วันนี้'],['silent','gray','เงียบ'],['active','green','ค้างทั้งหมด']
+  ].map(([k,c,l]) => `<button class="stat ${c} ${S.filter===k?'on':''}" data-filter="${k}"><b>${n[k]}</b><span>${l}</span></button>`).join('');
+
+  const people = [...new Set(S.data.contacts)];
+  const filters = [['active','ค้าง'],['all','ทั้งหมด'],['done','เสร็จแล้ว']];
+  $('chips').innerHTML =
+    filters.map(([k,l]) => `<button class="chip ${S.filter===k?'on':''}" data-filter="${k}">${l}</button>`).join('') +
+    people.map(p => `<button class="chip ${S.person===p?'on':''}" data-person="${esc(p)}">${esc(p)}</button>`).join('');
+
+  let list = all;
+  if (S.filter==='active') list = act;
+  else if (S.filter==='done') list = all.filter(x => x.done);
+  else if (S.filter==='overdue') list = act.filter(x => x.ds==='overdue' && !x.blocked);
+  else if (S.filter==='today') list = act.filter(x => x.ds==='today' && !x.blocked);
+  else if (S.filter==='silent') list = act.filter(x => x.silent);
+  if (S.person) list = list.filter(x => (S.filter==='done' ? x.contacts : x.pendingContacts).includes(S.person) ||
+                                        x.steps.some(s => s.done!=='1' && s.text.includes(S.person)));
+
+  list.sort((a,b) => (a.done-b.done) || (a.blocked-b.blocked) || (RANK[a.ds]-RANK[b.ds]) ||
+    (a.t.date && b.t.date ? a.t.date.localeCompare(b.t.date) : 0) || (Number(a.t.order)-Number(b.t.order)));
+  if (S.filter==='done') list.sort((a,b) => (b.t.doneAt||'').localeCompare(a.t.doneAt||''));
+
+  $('list').innerHTML = list.length ? list.map(cardHtml).join('')
+    : `<div class="empty">${S.filter==='done' ? 'ยังไม่มีงานที่เสร็จ' : '🎉 ไม่มีงานในมุมมองนี้'}</div>`;
+
+  renderPreview();
+  renderPlan();
+}
+
+function cardHtml(x){
+  const t = x.t;
+  const cls = x.done ? 'done' : x.blocked ? 'blocked' : x.ds;
+  let dl;
+  if (x.done) dl = `<span class="dl">เสร็จ ${t.doneAt ? thai(isoToYmd(t.doneAt)) : ''}</span>`;
+  else dl = {
+    overdue: `<button class="dl red" data-date="${t.id}">เลยกำหนด · ${thai(t.date)}</button>`,
+    today: `<button class="dl hot" data-date="${t.id}">วันนี้ · ${thai(t.date)}</button>`,
+    tomorrow: `<button class="dl hot" data-date="${t.id}">พรุ่งนี้ · ${thai(t.date)}</button>`,
+    upcoming: `<button class="dl" data-date="${t.id}">${thai(t.date,true)}</button>`,
+    none: `<button class="dl" data-date="${t.id}">ยังไม่ได้วัน</button>` }[x.ds];
+  const extra = [];
+  if (x.blocked) extra.push(`<span class="xtag">· รอ ${esc(x.dep.title)}</span>`);
+  if (x.silent) extra.push(`<span class="xtag">· เงียบ${x.silentDays>=1? ' '+x.silentDays+' วัน':''}</span>`);
+  if (t.notes) extra.push(`<button class="dl xtag" data-togglenotes="${t.id}">· โน้ต</button>`);
+  const dots = x.steps.slice(0,8).map(s => `<i class="${s.done==='1'?'on':''}"></i>`).join('');
+  const steps = x.steps.map(s => `
+    <li class="step ${s.done==='1'?'done':''}">
+      <label><input type="checkbox" data-step="${s.id}" ${s.done==='1'?'checked':''}>
+        <span class="txt">${esc(s.text)}</span>${s.contact && !s.text.includes(s.contact) ? `<span class="who">${esc(s.contact)}</span>` : ''}</label>
+      <button class="edit" data-editstep="${s.id}" aria-label="แก้ไขขั้นตอน">✎</button>
+    </li>`).join('');
+  return `<article class="card ${cls}" data-topic="${t.id}">
+    <div class="card-head"><div><div class="card-title">${!curProject() ? `<span class="ptag">${esc(projName(t.projectId))}</span>` : ''}${esc(t.title)}</div>
+      <div class="dline">${dl}${extra.join('')}</div></div>
+      <div class="cright"><div class="pdots" aria-label="เสร็จ ${x.doneCount} จาก ${x.steps.length}">${dots}</div><button class="more" data-menu="${t.id}" aria-label="เมนู">⋯</button></div></div>
+    <ul class="steps">${steps}</ul>
+    ${t.notes && S.notesOpen[t.id] ? `<div class="notes">${esc(t.notes)}</div>` : ''}
+    ${x.done ? '' : `<label class="upd">${IC.pen}<input class="add-step" data-addstep="${t.id}" placeholder="พิมพ์อัปเดต เช่น ช่างเลื่อน 2 วัน" enterkeyhint="send"></label>`}
+  </article>`;
+}
+function isoToYmd(iso){ const d=new Date(Date.parse(iso)+7*3600000); return d.toISOString().slice(0,10); }
+
+/* ================= list events ================= */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-filter],[data-person],[data-editstep],[data-date],[data-menu],[data-togglenotes]');
+  if (!el) return;
+  if (el.dataset.filter){ S.filter = el.dataset.filter; render(); }
+  else if (el.dataset.person !== undefined){ if (el.closest('#sheet')){ closeSheet(); S.person = el.dataset.person; S.tab='check'; } else S.person = S.person===el.dataset.person ? '' : el.dataset.person; render(); }
+  else if (el.dataset.editstep) stepMenu(el.dataset.editstep);
+  else if (el.dataset.date) dateSheet(el.dataset.date);
+  else if (el.dataset.menu) topicMenu(el.dataset.menu);
+  else if (el.dataset.togglenotes){ const id=el.dataset.togglenotes; S.notesOpen[id]=!S.notesOpen[id]; render(); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.step){
+    const s = S.data.steps.find(x => x.id===el.dataset.step);
+    if (s){ s.done = el.checked ? '1' : ''; s.doneAt = el.checked ? new Date().toISOString() : '';
+      const t = S.data.topics.find(x => x.id===s.topicId); if (t) t.updatedAt = new Date().toISOString();
+      S.data.now = Date.now(); }
+    render();
+    if (el.checked) toast('✓ ติ๊กแล้ว');
+    run('toggleStep', el.dataset.step, el.checked);
+  }
+});
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.addstep && e.key==='Enter'){
+    e.preventDefault();
+    const v = el.value.trim(); if (!v) return;
+    smartUpdate(el, el.dataset.addstep, v);
+  }
+});
+
+/** พิมพ์อัปเดตในการ์ด → AI ตีความ (เลื่อนวัน/ติ๊ก/เพิ่มขั้นตอน) → ให้ตรวจก่อนบันทึก */
+async function smartUpdate(el, topicId, text){
+  el.disabled = true; const ph = el.placeholder; el.value=''; el.placeholder = '⏳ กำลังวิเคราะห์…';
+  try{
+    const t = S.data.topics.find(x=>x.id===topicId);
+    S.pvProj = t ? t.projectId : curProject();
+    const r = await call('analyze', { text, images: [], projectId: S.pvProj, topicId });
+    S.pvWarn = r.warning || ''; S.pvSource = r.source;
+    S.preview = (r.items||[]).map(it => ({
+      kind: it.kind, topicId: it.topicId || '', title: it.title || '', date: it.date || '', notes: it.notes || '',
+      dependsOn: it.dependsOn || '', steps: (it.steps||[]).map(s => ({text:s.text, contact:s.contact||''})),
+      completeStepIds: it.completeStepIds || [], source: it.source || '', origKind: it.kind, origTitle: it.title || '', learnPhrase: '' }));
+    await autoApply(t);
+  }catch(e){ fail(e); el.value = text; }
+  el.disabled = false; el.placeholder = ph;
+}
+
+/** หน้าตรวจแบบสั้น (ดีไซน์ 1): ใช้เมื่อ AI เข้าใจว่าเป็นการอัปเดตการ์ดใบนี้ใบเดียว */
+function quickUpdateSheet(topicId, text){
+  const it = S.preview && S.preview.length===1 ? S.preview[0] : null;
+  if (!it || it.kind!=='update' || it.topicId!==topicId) return false;
+  const t = S.data.topics.find(x=>x.id===topicId); if (!t) return false;
+  const moved = it.date && it.date !== t.date;
+  const ticks = S.data.steps.filter(s => it.completeStepIds.includes(s.id) && s.done!=='1');
+  const adds = it.steps.filter(s => s.text.trim());
+  if (!moved && !ticks.length && !adds.length) return false;
+  const big = d => d ? Number(d.slice(8)) : '–';
+  const sub = d => d ? DOW[dow(d)]+' '+MON[Number(d.slice(5,7))-1] : 'ยังไม่มีวัน';
+  const diff = (t.date && it.date) ? Math.round((Date.parse(it.date)-Date.parse(t.date))/86400000) : null;
+  const rows = [];
+  if (ticks.length) rows.push(['✓','ติ๊กว่าเสร็จ', ticks.map(s=>esc(s.text)).join(' · ')]);
+  if (adds.length) rows.push(['+','เพิ่มขั้นตอน', adds.map(s=>esc(s.text)+(s.contact?' ('+esc(s.contact)+')':'')).join(' · ')]);
+  if (moved) rows.push(['⏰','แจ้งเตือนจะเลื่อนตาม', 'สรุปเช้า '+thai(it.date,true)+' · ปฏิทินอัปเดตเอง']);
+  openSheet(`<div class="ux">
+    <div class="uxh"><span class="aitag">${S.pvSource==='ai'?'✦ AI อ่านแล้ว':'⚙ ระบบอ่านแล้ว'}</span><span class="uxs">ตรวจก่อนบันทึก</span></div>
+    <div class="uxt">${esc(t.title)}</div><div class="uxq">“${esc(text)}”</div>
+    ${moved ? `<div class="uxl">เลื่อนวันนัด${diff!==null?` <b>${diff>0?'+':''}${diff}</b> วัน`:''}</div>
+      <div class="mv"><div class="mvd old"><b>${big(t.date)}</b><span>${sub(t.date)}</span></div>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1a1917" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <div class="mvd"><b>${big(it.date)}</b><span class="hot">${sub(it.date)}</span></div></div>` : ''}
+    ${rows.map(([i,a,b])=>`<div class="irow"><span class="ii">${i}</span><div><b>${a}</b><span>${b}</span></div></div>`).join('')}
+    ${S.pvWarn ? `<div class="warn" style="margin-top:10px">${esc(S.pvWarn)}</div>` : ''}
+    <div class="uxb"><button class="btn" id="uxEdit">แก้เอง</button><button class="btn primary" id="pvSave">✓ บันทึก</button></div></div>`);
+  $('uxEdit').onclick = () => { closeSheet(); renderPreview(); $('preview').scrollIntoView({behavior:'smooth', block:'start'}); };
+  $('pvSave').onclick = async () => { const y = window.scrollY; await savePreview(); if (!S.preview){ closeSheet(); window.scrollTo({top:y}); } };
+  return true;
+}
+
+/* ================= sheets (modal) ================= */
+function openSheet(html){ $('sheet').innerHTML = html; $('modal').classList.remove('hidden'); }
+function closeSheet(){ $('modal').classList.add('hidden'); $('sheet').innerHTML=''; }
+$('modal').addEventListener('click', e => { if (e.target.id==='modal') closeSheet(); });
+
+/* ชื่อคนใหม่: เพิ่มเองอัตโนมัติ ถ้าคล้ายคนเดิมค่อยถาม */
+const PFX = /^(คุณ|ช่าง|พี่|น้อง|เฮีย|เจ๊|ป้า|ลุง|น้า)/;
+function baseName(n){ return String(n||'').replace(PFX,'').replace(/\s+/g,''); }
+function lev1(a,b){ if (Math.abs(a.length-b.length)>1) return false; let i=0,j=0,d=0; while(i<a.length&&j<b.length){ if(a[i]===b[j]){i++;j++;continue;} if(++d>1) return false; if(a.length>b.length) i++; else if(b.length>a.length) j++; else {i++;j++;} } return d+(a.length-i)+(b.length-j)<=1; }
+function similarContact(n){
+  const b = baseName(n); if (!b) return '';
+  return (S.data.contacts||[]).find(c => { if (c===n) return false; const cb = baseName(c); if (!cb) return false;
+    return cb===b || (Math.min(cb.length,b.length)>=2 && (cb.startsWith(b)||b.startsWith(cb)) && Math.abs(cb.length-b.length)<=2) || (b.length>=3 && lev1(cb,b)); }) || '';
+}
+function newPersonHint(s,i,j){
+  if (!s.contact || (S.data.contacts||[]).includes(s.contact) || s.newOk) return '';
+  const sim = similarContact(s.contact);
+  if (sim) return `<div class="newp ask">“${esc(s.contact)}” คือ <b>${esc(sim)}</b> ใช่ไหม?
+    <button class="mini" data-pv="simyes" data-i="${i}" data-j="${j}" data-name="${esc(sim)}">ใช่ คนเดียวกัน</button>
+    <button class="mini" data-pv="simno" data-i="${i}" data-j="${j}">ไม่ใช่ คนใหม่</button></div>`;
+  return `<div class="newp">✨ คนใหม่ “${esc(s.contact)}” — จะเพิ่มในรายชื่อให้อัตโนมัติ</div>`;
+}
+function contactOptions(sel){
+  const list = [...new Set(S.data.contacts.concat(sel ? [sel] : []))];
+  return `<option value="">— ไม่ระบุ —</option>` + list.map(c => `<option ${c===sel?'selected':''}>${esc(c)}</option>`).join('') + `<option value="__new">➕ เพิ่มคนใหม่…</option>`;
+}
+function pickNewContact(selectEl){
+  if (selectEl.value !== '__new') return selectEl.value;
+  const n = (prompt('ชื่อคนใหม่ (เช่น คุณเอ, ช่างบี)') || '').trim();
+  if (!n){ selectEl.value=''; return ''; }
+  const o = document.createElement('option'); o.textContent = n; o.selected = true; selectEl.insertBefore(o, selectEl.lastElementChild);
+  return n;
+}
+
+function stepMenu(id){
+  const s = S.data.steps.find(x => x.id===id); if (!s) return;
+  openSheet(`<h2>แก้ไขขั้นตอน</h2>
+    <div class="field"><label>ข้อความ</label><input id="eText" value="${esc(s.text)}"></div>
+    <div class="field"><label>ผู้ประสานงาน</label><select id="eWho">${contactOptions(s.contact)}</select></div>
+    <div class="pv-row"><button class="btn primary" id="eSave" style="flex:1">บันทึก</button>
+    <button class="btn danger" id="eDel">ลบ</button><button class="btn ghost" id="eCancel">ปิด</button></div>`);
+  $('eWho').onchange = () => pickNewContact($('eWho'));
+  $('eCancel').onclick = closeSheet;
+  $('eSave').onclick = () => { const text=$('eText').value.trim(); const contact=$('eWho').value==='__new'?'':$('eWho').value;
+    if(!text) return; s.text=text; s.contact=contact; closeSheet(); render(); run('updateStep', id, {text, contact}); };
+  $('eDel').onclick = () => { if(!confirm('ลบขั้นตอนนี้?')) return; S.data.steps=S.data.steps.filter(x=>x.id!==id); closeSheet(); render(); run('deleteStep', id); };
+}
+
+function dateSheet(id){
+  const t = S.data.topics.find(x => x.id===id); if (!t) return;
+  const today = S.data.today;
+  const quick = [['วันนี้',today],['พรุ่งนี้',addDays(today,1)],['มะรืน',addDays(today,2)],['+1 สัปดาห์',addDays(today,7)]];
+  openSheet(`<h2>📅 วันนัด: ${esc(t.title)}</h2>
+    <div class="field"><input type="date" id="dIn" value="${esc(t.date)}"></div>
+    <div class="pv-row" style="flex-wrap:wrap">${quick.map(q=>`<button class="mini" data-q="${q[1]}">${q[0]} (${thai(q[1])})</button>`).join('')}</div>
+    <div class="pv-row" style="margin-top:10px"><button class="btn primary" id="dSave" style="flex:1">บันทึก</button>
+    <button class="btn danger" id="dClear">ล้างวัน</button><button class="btn ghost" id="dCancel">ปิด</button></div>`);
+  $('sheet').querySelectorAll('[data-q]').forEach(b => b.onclick = () => $('dIn').value = b.dataset.q);
+  const save = v => { t.date=v; t.updatedAt=new Date().toISOString(); closeSheet(); render(); run('updateTopic', id, {date:v}); };
+  $('dSave').onclick = () => save($('dIn').value);
+  $('dClear').onclick = () => save('');
+  $('dCancel').onclick = closeSheet;
+}
+
+function topicMenu(id){
+  const t = S.data.topics.find(x => x.id===id); if (!t) return;
+  const others = S.data.topics.filter(x => x.id!==id && x.status!=='done');
+  openSheet(`<h2>${esc(t.title)}</h2>
+    <div class="field"><label>ชื่อหัวข้อ</label><input id="mTitle" value="${esc(t.title)}"></div>
+    <div class="field"><label>ต้องรอหัวข้อนี้เสร็จก่อน</label><select id="mDep"><option value="">— ไม่ต้องรอ —</option>
+      ${others.map(o=>`<option value="${o.id}" ${o.id===t.dependsOn?'selected':''}>${esc(o.title)}</option>`).join('')}
+      ${t.dependsOn && !others.find(o=>o.id===t.dependsOn) ? `<option value="${t.dependsOn}" selected>(หัวข้อที่เสร็จแล้ว)</option>`:''}</select></div>
+    <div class="field"><label>โน้ต</label><textarea id="mNotes" rows="3">${esc(t.notes)}</textarea></div>
+    <button class="btn primary" id="mSave" style="width:100%;margin-bottom:12px">บันทึก</button>
+    <div class="menu">
+      ${t.status==='done' ? `<button id="mReopen">↩️ เปิดงานนี้ใหม่</button>` : `<button id="mDone">✅ ทำเครื่องหมายว่าเสร็จทั้งหัวข้อ</button>`}
+      <button class="red" id="mDel">🗑 ลบหัวข้อนี้</button>
+      <button id="mClose">ปิด</button>
+    </div>`);
+  $('mSave').onclick = () => { const p={title:$('mTitle').value.trim()||t.title, dependsOn:$('mDep').value, notes:$('mNotes').value};
+    Object.assign(t,p); closeSheet(); render(); run('updateTopic', id, p); };
+  if ($('mDone')) $('mDone').onclick = () => { closeSheet(); toast('เสร็จทั้งหัวข้อ ✓'); run('updateTopic', id, {status:'done'}); };
+  if ($('mReopen')) $('mReopen').onclick = () => { closeSheet(); run('updateTopic', id, {status:'active'}); };
+  $('mDel').onclick = () => { if(!confirm('ลบ “'+t.title+'” และขั้นตอนทั้งหมด?')) return; closeSheet(); S.data.topics=S.data.topics.filter(x=>x.id!==id); render(); run('deleteTopic', id); };
+  $('mClose').onclick = closeSheet;
+}
+
+/* ================= settings ================= */
+$('btnSettings').onclick = () => {
+  const st = S.data ? S.data.settings : {};
+  openSheet(`<h2>⚙️ ตั้งค่า</h2>
+    ${st.appLink ? `<div class="field"><label>📲 ลิงก์ติดตั้งแอป</label>
+      <div class="pv-row"><input id="sAppLink" readonly value="${esc(st.appLink)}" style="flex:1;min-width:0"><button class="btn" id="sAppCopy">คัดลอก</button></div>
+      <div class="hint">เปิดลิงก์นี้ในมือถือ/คอมเครื่องใหม่ครั้งเดียว · ห้ามส่งให้คนอื่น (ใช้แทนรหัสผ่าน)</div></div>` : ''}
+    <div class="field"><label>🔔 แจ้งเตือน ${st.hasBark ? '<span style="color:var(--ink)">· แอป Bark ✓ เชื่อมแล้ว</span>' : '<span style="color:var(--red)">· ยังไม่ได้เชื่อมแอป Bark</span>'}</label>
+      <div class="hint">ทุกวัน ${esc(st.morning)} และ ${esc(st.evening)} น. · สรุปสัปดาห์ทุกวันอาทิตย์ ${esc(st.weekly||'18:00')} น. · ถ้า Bark ส่งไม่ได้ จะส่งเข้า Gmail แทน</div></div>
+    <div class="pv-row" style="flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn" data-send="testNotify">ส่งทดสอบ</button>
+      <button class="btn" data-send="sendMorningNow">☀️ ส่งสรุปเช้าตอนนี้</button>
+      <button class="btn" data-send="sendEveningNow">🌆 ส่งสรุปเย็นตอนนี้</button>
+      <button class="btn" data-send="sendWeeklyNow">🗓 ส่งสรุปสัปดาห์ตอนนี้</button>
+      <button class="btn" data-send="syncCalendarNow">📅 ซิงค์ปฏิทิน</button></div>
+    <div class="hint" style="margin:-6px 0 14px">📱 วิดเจ็ตอ่านงานจากปฏิทิน "แผนงานหน้างาน" ในไอโฟน (แอป Scriptable)</div>
+    <div class="field"><label>✨ คีย์ Gemini ${st.hasGemini ? '<span style="color:var(--accent)">✓ ตั้งไว้แล้ว</span>' : '<span style="color:var(--red)">ยังไม่ได้ตั้ง</span>'}</label>
+      <input id="sKey" type="password" placeholder="${st.hasGemini ? 'ใส่ใหม่ถ้าต้องการเปลี่ยน' : 'วางคีย์ที่ขึ้นต้นด้วย AIza…'}" autocomplete="off">
+      <div class="hint">ขอคีย์ฟรีที่ aistudio.google.com → Get API key</div></div>
+    <div class="field"><label>รุ่น Gemini</label><input id="sModel" value="${esc(st.geminiModel||'')}">
+      <div class="hint">ปกติไม่ต้องแก้ ถ้า Google เปลี่ยนชื่อรุ่น ค่อยมาแก้ตรงนี้</div></div>
+    <button class="btn primary" id="sSave" style="width:100%;margin-bottom:10px">บันทึกการตั้งค่า</button>
+    ${st.sheetUrl ? `<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px" href="${esc(st.sheetUrl)}" target="_blank">📊 เปิด Google Sheet ข้อมูล</a>` : ''}
+    <button class="btn ghost" id="sClose" style="width:100%">ปิด</button>`);
+  $('sheet').querySelectorAll('[data-send]').forEach(b => b.onclick = async () => {
+    b.disabled = true; try{ const r = await call(b.dataset.send); toast(r===false ? 'ส่งไม่สำเร็จ' : (typeof r==='string'? r : 'ส่งแล้ว ✓')); }catch(e){ fail(e); } b.disabled=false; });
+  if ($('sAppCopy')) $('sAppCopy').onclick = () => { const i=$('sAppLink'); i.select(); (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(()=>toast('คัดลอกแล้ว ✓'), ()=>{ document.execCommand('copy'); toast('คัดลอกแล้ว ✓'); }); };
+  $('sSave').onclick = async () => { const d = await run('saveSettings', {geminiKey:$('sKey').value, geminiModel:$('sModel').value}); if(d){ toast('บันทึกแล้ว ✓'); closeSheet(); } };
+  $('sClose').onclick = closeSheet;
+};
+$('btnRefresh').onclick = () => { toast('กำลังรีเฟรช…'); load(); };
+
+/* ================= composer ================= */
+const ta = $('inText');
+$('btnAnalyze').innerHTML = IC.spark;
+ta.addEventListener('input', () => { ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,200)+'px'; });
+$('btnImg').onclick = () => $('inFile').click();
+$('inFile').onchange = async e => {
+  const files = [...e.target.files].slice(0, 4 - S.images.length);
+  for (const f of files){ try{ S.images.push(await shrink(f)); }catch(err){ toast('อ่านรูปไม่ได้'); } }
+  e.target.value=''; renderThumbs();
+};
+function renderThumbs(){
+  $('thumbs').innerHTML = S.images.map((im,i)=>`<div class="thumb"><img src="${im.url}"><button data-rmimg="${i}">✕</button></div>`).join('');
+  $('thumbs').querySelectorAll('[data-rmimg]').forEach(b => b.onclick = () => { S.images.splice(Number(b.dataset.rmimg),1); renderThumbs(); });
+}
+function shrink(file){
+  return new Promise((res, rej) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const max = 1600, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width*k); c.height = Math.round(img.height*k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const dataUrl = c.toDataURL('image/jpeg', 0.82);
+      res({ url: dataUrl, data: dataUrl.split(',')[1], mime: 'image/jpeg' });
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = rej; img.src = url;
+  });
+}
+$('btnAnalyze').onclick = async () => {
+  const text = ta.value.trim();
+  if (!text && !S.images.length){ toast('พิมพ์ข้อความหรือเลือกรูปก่อน'); ta.focus(); return; }
+  const b = $('btnAnalyze'); b.disabled = true; b.innerHTML = '<span class="spin" style="margin:0;color:#fff"></span>'; toast('กำลังวิเคราะห์…', 8000);
+  try{
+    S.pvProj = curProject() || (projects()[0]||{}).id || '';
+    const r = await call('analyze', { text, images: S.images.map(i => ({data:i.data, mime:i.mime})), projectId: S.pvProj });
+    S.pvWarn = r.warning || ''; S.pvSource = r.source;
+    S.preview = (r.items||[]).map(it => ({
+      kind: it.kind, topicId: it.topicId || '', title: it.title || '', date: it.date || '', notes: it.notes || '',
+      dependsOn: it.dependsOn || '', steps: (it.steps||[]).map(s => ({text:s.text, contact:s.contact||''})),
+      completeStepIds: it.completeStepIds || [], source: it.source || '', origKind: it.kind, origTitle: it.title || '', learnPhrase: ''
+    }));
+    if (!S.preview.length && !S.pvWarn) S.pvWarn = 'ไม่พบเรื่องงานในข้อความนี้';
+    await autoApply();
+  }catch(e){ fail(e); }
+  b.disabled = false; b.innerHTML = IC.spark;
+};
+
+/* ================= preview ================= */
+function renderPreview(){
+  const box = $('preview');
+  if (!S.preview){ box.innerHTML=''; return; }
+  const topics = S.data.topics.filter(t => !S.pvProj || t.projectId===S.pvProj).sort((a,b)=>(a.status==='done')-(b.status==='done') || a.title.localeCompare(b.title,'th'));
+  const cards = S.preview.map((it, i) => {
+    const sel = it.kind==='skip' ? 'skip' : it.kind==='new' ? 'new' : it.topicId;
+    const opts = `<option value="new" ${sel==='new'?'selected':''}>➕ สร้างหัวข้อใหม่</option>` +
+      topics.map(t => `<option value="${t.id}" ${sel===t.id?'selected':''}>→ ${esc(t.title)}${t.status==='done'?' (เสร็จแล้ว)':''}</option>`).join('') +
+      `<option value="skip" ${sel==='skip'?'selected':''}>🚫 ไม่ต้องบันทึก</option>`;
+    let body = '';
+    if (it.kind !== 'skip'){
+      if (it.kind === 'new') body += `<div class="lbl">ชื่อหัวข้อ</div><input type="text" data-pv="title" data-i="${i}" value="${esc(it.title)}">`;
+      if (it.kind === 'update'){
+        const ex = S.data.steps.filter(s => s.topicId===it.topicId).sort((a,b)=>Number(a.order)-Number(b.order));
+        if (ex.length) body += `<div class="lbl">ติ๊กขั้นตอนที่เสร็จแล้ว</div>` + ex.map(s => `<label class="pv-done">
+            <input type="checkbox" data-pv="complete" data-i="${i}" data-sid="${s.id}" ${s.done==='1'||it.completeStepIds.includes(s.id)?'checked':''} ${s.done==='1'?'disabled':''}>
+            <span style="${s.done==='1'?'text-decoration:line-through;color:#999':''}">${esc(s.text)}</span></label>`).join('');
+        if (it.learnPhrase) body += `<div class="learn">🧠 จะจำไว้ว่าเรื่องแบบ “${esc(it.learnPhrase)}” อยู่ในหัวข้อนี้</div>`;
+      }
+      const oldT = it.kind==='update' ? S.data.topics.find(x=>x.id===it.topicId) : null;
+      const moved = oldT && it.date && it.date !== oldT.date;
+      body += `<div class="lbl">📅 วันนัด${oldT ? (moved ? ` <span style="color:var(--orange)">เลื่อนจาก ${oldT.date ? thai(oldT.date,true) : 'ยังไม่มีวัน'} → ${thai(it.date,true)}</span>` : (oldT.date ? ` (เดิม ${thai(oldT.date,true)})` : '')) : ''}</div><input type="date" data-pv="date" data-i="${i}" value="${esc(it.date)}">`;
+      body += `<div class="lbl">${it.kind==='update' ? 'ขั้นตอนที่จะเพิ่ม' : 'ขั้นตอน'}</div>` +
+        it.steps.map((s, j) => `<div class="pv-row pv-step">
+          <input type="text" data-pv="stext" data-i="${i}" data-j="${j}" value="${esc(s.text)}">
+          <select data-pv="scontact" data-i="${i}" data-j="${j}">${contactOptions(s.contact)}</select>
+          <button class="x" data-pv="rm" data-i="${i}" data-j="${j}">✕</button></div>${newPersonHint(s,i,j)}`).join('') +
+        `<button class="mini" data-pv="add" data-i="${i}">+ ขั้นตอน</button>`;
+      if (it.notes) body += `<div class="pv-src">📝 ${esc(it.notes)}</div>`;
+    }
+    if (it.source) body += `<div class="pv-src">จาก: “${esc(it.source.slice(0,120))}”</div>`;
+    return `<div class="pv-card ${it.kind==='skip'?'skip':''}"><select data-pv="target" data-i="${i}">${opts}</select>${body}</div>`;
+  }).join('');
+  const src = S.pvSource==='ai' ? '✨ AI แยกให้แล้ว' : S.pvSource==='rules' ? '⚙️ ระบบกฎแยกให้' : '';
+  const ps = projects();
+  const projSel = ps.length>1 ? `<div class="lbl">บันทึกไปที่โปรเจกต์</div><select id="pvProj" style="width:100%;border:1px solid var(--line);border-radius:9px;padding:7px 9px;margin-bottom:8px">${ps.map(p=>`<option value="${p.id}" ${p.id===S.pvProj?'selected':''}>🏠 ${esc(p.name)}</option>`).join('')}</select>` : '';
+  box.innerHTML = `<div class="pv"><h3>ตรวจก่อนบันทึก ${src ? '<small style="color:var(--sub);font-weight:500">· '+src+'</small>' : ''}</h3>${projSel}
+    ${S.pvWarn ? `<div class="warn">${esc(S.pvWarn)}</div>` : ''}
+    ${cards}
+    <div class="pv-row" style="margin-top:6px">
+      ${S.preview.length ? `<button class="btn primary" id="pvSave" style="flex:1">✅ บันทึก ${S.preview.filter(x=>x.kind!=='skip').length} เรื่อง</button>` : ''}
+      <button class="btn ghost" id="pvCancel">ยกเลิก</button></div></div>`;
+  if ($('pvSave')) $('pvSave').onclick = savePreview;
+  if ($('pvProj')) $('pvProj').onchange = () => { S.pvProj = $('pvProj').value; S.preview.forEach(it => { if (it.kind==='update'){ it.kind='new'; it.topicId=''; } }); renderPreview(); };
+  $('pvCancel').onclick = () => { S.preview=null; S.pvWarn=''; renderPreview(); };
+}
+
+$('preview').addEventListener('input', e => {
+  const el = e.target, k = el.dataset.pv; if (!k) return;
+  const it = S.preview[Number(el.dataset.i)];
+  if (k==='title') it.title = el.value;
+  else if (k==='date') it.date = el.value;
+  else if (k==='stext') it.steps[Number(el.dataset.j)].text = el.value;
+});
+$('preview').addEventListener('change', e => {
+  const el = e.target, k = el.dataset.pv; if (!k) return;
+  const it = S.preview[Number(el.dataset.i)];
+  if (k==='target'){
+    const v = el.value;
+    if (v==='skip') it.kind='skip';
+    else if (v==='new'){ it.kind='new'; it.topicId=''; it.learnPhrase=''; if(!it.title) it.title = it.origTitle; }
+    else {
+      it.kind='update'; it.topicId=v;
+      // ผู้ใช้ย้ายเรื่องใหม่ไปหัวข้อเดิม → จำคำนี้ไว้ใช้ครั้งหน้า
+      it.learnPhrase = it.origKind==='new' ? (it.origTitle || it.title) : '';
+    }
+    renderPreview();
+  } else if (k==='date') it.date = el.value;
+  else if (k==='scontact') it.steps[Number(el.dataset.j)].contact = pickNewContact(el);
+  else if (k==='complete'){
+    const sid = el.dataset.sid;
+    it.completeStepIds = el.checked ? [...new Set(it.completeStepIds.concat(sid))] : it.completeStepIds.filter(x=>x!==sid);
+  }
+});
+$('preview').addEventListener('click', e => {
+  const el = e.target.closest('[data-pv="rm"],[data-pv="add"],[data-pv="simyes"],[data-pv="simno"]'); if (!el) return;
+  const it = S.preview[Number(el.dataset.i)];
+  if (el.dataset.pv==='simyes'){ it.steps[Number(el.dataset.j)].contact = el.dataset.name; }
+  else if (el.dataset.pv==='simno'){ it.steps[Number(el.dataset.j)].newOk = true; }
+  else if (el.dataset.pv==='rm') it.steps.splice(Number(el.dataset.j),1);
+  else it.steps.push({text:'', contact:''});
+  renderPreview();
+});
+
+function pvItems(){
+  return S.preview.filter(x => x.kind!=='skip').map(x => ({
+    kind:x.kind, topicId:x.topicId, title:x.title, date:x.date, notes:x.notes, dependsOn:x.dependsOn,
+    steps:x.steps.filter(s=>s.text.trim()), completeStepIds:x.completeStepIds, learnPhrase:x.learnPhrase }));
+}
+/** บันทึกทันทีหลังวิเคราะห์ (แก้ทีหลังที่การ์ดได้) — หยุดถามเฉพาะตอนเจอชื่อคล้ายคนเดิม หรือไม่พบเรื่องงาน */
+async function autoApply(cardTopic){
+  const items = pvItems();
+  const ask = S.preview.some(it => it.kind!=='skip' && it.steps.some(s => s.contact && !(S.data.contacts||[]).includes(s.contact) && similarContact(s.contact)));
+  if (!items.length || ask){
+    renderPreview(); $('preview').scrollIntoView({behavior:'smooth', block:'start'});
+    if (ask) toast('เจอชื่อคล้ายคนเดิม — ช่วยเลือกก่อนบันทึก', 4000);
+    return false;
+  }
+  const before = cardTopic ? cardTopic.date : '';
+  const d = await run('applyItems', items, S.pvProj || curProject());
+  if (!d){ renderPreview(); return false; }
+  const nNew = items.filter(x=>x.kind==='new').length, nUp = items.length - nNew;
+  S.preview=null; S.pvWarn=''; S.images=[]; renderThumbs(); render();
+  if (cardTopic){
+    const t = S.data.topics.find(x=>x.id===cardTopic.id);
+    toast(t && t.date && t.date!==before ? `เลื่อนเป็น ${thai(t.date,true)} ✓` : 'อัปเดตแล้ว ✓', 3500);
+  } else {
+    ta.value=''; ta.style.height='';
+    toast([nNew?`เพิ่ม ${nNew} หัวข้อ`:'', nUp?`อัปเดต ${nUp} เรื่อง`:''].filter(Boolean).join(' · ') + ' ✓ · ผิดตรงไหนกด ⋯ ที่การ์ดเพื่อแก้', 4500);
+  }
+  return true;
+}
+async function savePreview(){
+  const items = pvItems();
+  const b = $('pvSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span>กำลังบันทึก';
+  const d = await run('applyItems', items, S.pvProj || curProject());
+  if (d){ S.preview=null; S.pvWarn=''; S.images=[]; ta.value=''; ta.style.height=''; renderThumbs(); render(); toast('บันทึกแล้ว ✓'); window.scrollTo({top:0,behavior:'smooth'}); }
+  else { b.disabled=false; b.textContent='✅ ลองบันทึกอีกครั้ง'; }
+}
+
+/* ================= plan ================= */
+function isOff(d){ return (S.data.holidays||[]).includes(d); }
+function isNonWork(d){ const w=dow(d); return w===0||w===6||isOff(d); }
+function workDays(s,e){ const o=[]; if(!s||!e||e<s) return o; for(let d=s,g=0; d<=e&&g<400; d=addDays(d,1),g++) if(!isOff(d)) o.push(d); return o; }
+function planDerive(){
+  const pid = curProject();
+  const plan = (S.data.plan || []).filter(p => !pid || p.projectId===pid), today = S.data.today, map = {};
+  plan.forEach(p => map[p.id]=p);
+  return plan.map(p => {
+    const days = workDays(p.start,p.end), done = p.status==='done';
+    const depsOpen = String(p.deps||'').split(',').filter(Boolean).map(id=>map[id]).filter(d=>d && d.status!=='done');
+    let state = done?'done' : p.end<today?'overdue' : p.end===today?'ending' : p.start<=today?'active':'upcoming';
+    return { p, days, done, depsOpen, state, dayIdx: days.indexOf(today)+1,
+      askStart: !done && p.status==='todo' && p.start<=today && p.end>=today,
+      askEnd: !done && (p.end<today || (p.end===today && (p.status==='doing' || p.start<today))) };
+  }).sort((a,b)=>Number(a.p.order)-Number(b.p.order));
+}
+function progress(D){ let a=0,d=0; D.forEach(x=>{const w=Math.max(1,x.days.length); a+=w; if(x.done) d+=w;}); return a?Math.round(d*100/a):0; }
+function stChip(x){
+  if (x.done) return '<span class="st st-done">จบแล้ว</span>';
+  if (x.state==='overdue') return '<span class="st st-overdue">เลยกำหนด</span>';
+  if (x.state==='ending') return '<span class="st st-ending">วันสุดท้าย</span>';
+  if (x.p.status==='doing') return '<span class="st st-doing">กำลังทำ</span>';
+  return '<span class="st st-todo">ยังไม่เริ่ม</span>';
+}
+function catName(c){ const a=String(c||'').split(' '); return a.length>1 ? a.slice(1).join(' ') : (c||'อื่น ๆ'); }
+function catEmoji(c){ return String(c).split(' ')[0]; }
+function rangeTxt(p){ return p.start===p.end ? thai(p.start,true) : thai(p.start)+' – '+thai(p.end); }
+
+function renderTabs(asks){
+  $('tabs').innerHTML = `<div class="navin"><div class="navpill">
+    <button class="nb ${S.tab==='check'?'on':''}" data-tab="check" aria-label="เช็คลิสต์">${IC.check}</button>
+    <button class="nb ${S.tab==='plan'?'on':''}" data-tab="plan" aria-label="แผนงาน">${IC.cal}${asks?'<i class="ndot"></i>':''}</button>
+    <button class="nb" data-people="1" aria-label="ผู้ประสานงาน">${IC.person}</button></div>
+    <button class="fab" data-fab="1" aria-label="${S.tab==='plan'?'เพิ่มงานในแผน':'พิมพ์งานใหม่'}">${IC.plus}</button></div>`;
+  $('checkView').hidden = S.tab!=='check';
+  $('planView').hidden = S.tab!=='plan';
+  document.body.classList.toggle('tab-plan', S.tab==='plan');
+}
+
+function shortName(n){ return String(n).replace(/^สีย้อม\s*/,'สีย้อม ').slice(0,34); }
+function askCard(x){
+  const end = x.askEnd, p = x.p;
+  const lbl = end ? (x.state==='overdue' ? 'เลยกำหนด '+thai(p.end) : 'วันสุดท้าย '+thai(p.end)) : 'ถึงคิว '+thai(p.start);
+  const idx = x.dayIdx ? ` · ${x.dayIdx}/${x.days.length}` : (x.state==='overdue' ? ` · ${x.days.length}/${x.days.length}` : '');
+  const wait = !end && x.depsOpen.length ? `<div class="qw">งานก่อนหน้ายังไม่จบ: ${x.depsOpen.map(d=>esc(d.name)).join(', ')} — ต้องเลื่อนไหม?</div>` : '';
+  const btns = end
+    ? `<button class="qb w" data-pa="done" data-id="${p.id}">จบแล้ว</button>
+       <button class="qb" data-pa="extend" data-id="${p.id}">${x.state==='overdue'?'ทำต่อวันนี้':'ต่อ 1 วัน'}</button>`
+    : `<button class="qb w" data-pa="start" data-id="${p.id}">เริ่มแล้ว</button>
+       <button class="qb" data-pa="shift" data-id="${p.id}">เลื่อน 1 วัน</button>`;
+  return `<div class="qcard"><div class="ql">${lbl}${idx}</div>
+    <div class="qt">${esc(p.name)} ${end?'จบแล้วไหม?':'เริ่มได้ยัง?'}</div>
+    <div class="qm">${esc(catName(p.cat))}${p.area?' · '+esc(p.area):''}</div>${wait}
+    <div class="qacts">${btns}<button class="qb c" data-pa="dates" data-id="${p.id}" aria-label="เลือกวัน">${IC.calS}</button></div></div>`;
+}
+
+function renderPlan(){
+  if (!S.data) return;
+  const D = planDerive(), today = S.data.today;
+  const asks = D.filter(x => x.askStart || x.askEnd);
+  renderTabs(asks.length);
+
+  if (S.tab==='check'){
+    $('asks').innerHTML = asks.length ? `<button class="banner" data-tab="plan"><i class="bd"></i><span class="bt">
+      <b>แผนงานรอคำตอบ ${asks.length} เรื่อง</b>
+      <small>${asks.slice(0,2).map(x=>esc(shortName(x.p.name))+(x.askEnd?' จบแล้วไหม':' เริ่มได้ยัง')).join(' · ')}</small></span>${IC.arrow}</button>` : '';
+    return;
+  }
+  $('asks').innerHTML = '';
+  const pn = projName(curProject()) || 'ทุกโปรเจกต์';
+  if (!D.length){
+    $('planView').innerHTML = `<div class="ph"><div><h2>แผนงาน</h2><button class="psub" id="psub">${esc(pn)} ▾</button></div><button class="fabsm" id="btnAddPlan" aria-label="เพิ่มงานในแผน">${IC.plusS}</button></div>
+      <div class="empty">ยังไม่มีแผนงานในโปรเจกต์นี้ — กด + เพื่อเพิ่ม</div>`;
+    $('btnAddPlan').onclick = addPlanSheet; $('psub').onclick = projSheet; return;
+  }
+  const pct = progress(D);
+  const first = D.reduce((m,x)=>x.p.start<m?x.p.start:m, D[0].p.start);
+  const last = D.reduce((m,x)=>x.p.end>m?x.p.end:m, D[0].p.end);
+  const left = Math.max(0, Math.round((Date.parse(last)-Date.parse(today))/86400000));
+  const NSEG = 18, on = Math.round(pct*NSEG/100);
+  const segs = Array.from({length:NSEG},(_,i)=>`<i class="${i<on?'on':(i===on&&pct<100?'cur':'')}"></i>`).join('');
+
+  // ปฏิทินวงกลม
+  const dayMap = {};
+  D.forEach(x => x.days.forEach(d => (dayMap[d]=dayMap[d]||[]).push(x)));
+  if (!S.selDay) S.selDay = today;
+  const mon = d => addDays(d, -((dow(d)+6)%7));
+  const startFrom = S.calAll || today<first || today>last ? first : today;
+  let d = mon(startFrom), stop = addDays(mon(last), 6);
+  const H = ['จ','อ','พ','พฤ','ศ','ส','อา'], tdIdx = (dow(today)+6)%7;
+  let cells = H.map((h,i)=>`<div class="ch7 ${i===tdIdx?'now':''}">${h}</div>`).join('');
+  for (let g=0; d<=stop && g<200; d=addDays(d,1), g++){
+    const items = dayMap[d]||[], n = Number(d.slice(8));
+    let c = 'cd';
+    if (d===today) c += ' today';
+    else if (d<first || d>last) c += ' out';
+    else if (d===last) c += ' end';
+    else if (isNonWork(d)) c += ' off';
+    else if (d<today) c += ' past';
+    else c += items.length ? '' : ' free';
+    if (d===S.selDay) c += ' sel';
+    const m = n===1 ? `<small>${MON[Number(d.slice(5,7))-1]}</small>` : '';
+    cells += `<button class="${c}" data-day="${d}" aria-label="${thai(d,true)}">${n}${m}</button>`;
+  }
+  const cal = `<div class="calbox"><div class="cgrid">${cells}</div>
+    <div class="legend"><span><i class="k"></i>ผ่านแล้ว</span><span><i class="o"></i>วันนี้</span><span><i></i>มีงาน</span><span><i class="r"></i>หยุด</span></div>
+    ${first<today ? `<button class="calmore" data-calall="1">${S.calAll?'ซ่อนสัปดาห์ที่ผ่านมา':'ดูตั้งแต่วันเริ่มงาน'}</button>` : ''}</div>`;
+
+  // วันที่เลือก
+  const sel = dayMap[S.selDay]||[];
+  const hol = (S.data.holidayNames||{})[S.selDay];
+  const dayBox = `<div class="daybox"><div class="dayhead">${S.selDay===today?'วันนี้ · ':''}${thai(S.selDay,true)}${hol?' · 🇹🇭 '+esc(hol):(isNonWork(S.selDay)&&!sel.length?' · วันหยุด':'')}</div>
+    ${sel.length ? sel.map(taskRow).join('') : '<div class="hint">ไม่มีงานในแผนวันนี้</div>'}</div>`;
+
+  // หมวด
+  const cats = (S.data.planCats||[]).filter(c => D.some(x=>x.p.cat===c));
+  if (D.some(x=>!x.p.cat)) cats.push('');
+  const catHtml = cats.map((c,i) => {
+    const it = D.filter(x=>(x.p.cat||'')===c), dn = it.filter(x=>x.done).length;
+    const active = it.some(x=>!x.done && x.p.start<=today);
+    const cn = dn===it.length ? 'ok' : active ? 'on' : '';
+    const segs = it.map(x=>`<i class="${x.done?'d':x.state==='overdue'?'l':(x.p.start<=today?'a':'')}"></i>`).join('');
+    return `<details class="catrow" ${S.catOpen&&S.catOpen[c]?'open':''} data-cat="${esc(c)}"><summary>
+      <span class="cn ${cn}">${i+1}</span><span class="cname">${esc(catName(c))}</span><span class="csegs">${segs}</span></summary>
+      <div class="clist">${it.map(taskRow).join('')}</div></details>`;
+  }).join('');
+
+  $('planView').innerHTML = `<div class="ph"><div><h2>แผนงาน</h2>
+      <button class="psub" id="psub">${esc(pn)} · ${D.length} งาน · ส่งมอบ ${thai(last)}</button></div>
+      <button class="fabsm" id="btnAddPlan" aria-label="เพิ่มงานในแผน">${IC.plusS}</button></div>
+    <div class="pct"><div class="big">${pct}<small>%</small></div><div class="pr">
+      <div class="pl"><span>ความคืบหน้า</span><span>อีก ${left} วัน</span></div><div class="segs">${segs}</div></div></div>
+    ${cal}
+    ${(S.asksAll?asks:asks.slice(0,2)).map(askCard).join('')}
+    ${asks.length>2 ? `<button class="qmore" data-asksall="1">${S.asksAll?'ย่อ':'ดูคำถามอีก '+(asks.length-2)+' เรื่อง'}</button>` : ''}
+    ${dayBox}
+    <div class="cats">${catHtml}</div>
+    <div class="plinks"><button class="btn ghost" id="btnSyncCal">ซิงค์ Google Calendar ตอนนี้</button></div>`;
+  $('btnAddPlan').onclick = addPlanSheet;
+  $('psub').onclick = projSheet;
+  $('planView').querySelectorAll('details.catrow').forEach(el => el.addEventListener('toggle', () => { S.catOpen = S.catOpen||{}; S.catOpen[el.dataset.cat] = el.open; }));
+  $('btnSyncCal').onclick = async () => { toast('กำลังซิงค์…'); try{ toast(await call('syncCalendarNow')); }catch(e){ fail(e); } };
+}
+function addPlanSheet(){
+  const cats = S.data.planCats || [], today = S.data.today, ps = projects(), cur = curProject() || (ps[0]||{}).id;
+  openSheet(`<h2>➕ เพิ่มงานในแผน</h2>
+    ${ps.length>1 ? `<div class="field"><label>โปรเจกต์</label><select id="aP">${ps.map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>🏠 ${esc(p.name)}</option>`).join('')}</select></div>` : ''}
+    <div class="field"><label>ชื่องาน</label><input id="aN" placeholder="เช่น ติดตั้งวอลล์เปเปอร์ห้องนอน"></div>
+    <div class="field"><label>หมวด</label><select id="aC"><option value="">📌 อื่น ๆ (ไม่ระบุหมวด)</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}<option value="__new">➕ หมวดใหม่…</option></select></div>
+    <div class="field"><label>พื้นที่ (ไม่ใส่ก็ได้)</label><input id="aA" placeholder="เช่น Master Bedroom"></div>
+    <div class="pv-row"><div class="field" style="flex:1"><label>วันเริ่ม</label><input type="date" id="aS" value="${today}"></div>
+    <div class="field" style="flex:1"><label>วันจบ</label><input type="date" id="aE" value="${today}"></div></div>
+    <div class="pv-row"><button class="btn primary" id="aSave" style="flex:1">บันทึก</button><button class="btn ghost" id="aCancel">ปิด</button></div>`);
+  $('aC').onchange = () => { if ($('aC').value==='__new'){ const n=(prompt('ชื่อหมวดใหม่ (ใส่อีโมจิข้างหน้าได้ เช่น 🧱 งานพื้น)')||'').trim(); if(!n){ $('aC').selectedIndex=0; return; } const o=document.createElement('option'); o.textContent=n; o.selected=true; $('aC').insertBefore(o,$('aC').lastElementChild); } };
+  $('aCancel').onclick = closeSheet;
+  $('aSave').onclick = async () => {
+    const o = { projectId: $('aP') ? $('aP').value : cur, name: $('aN').value.trim(), cat: $('aC').value==='__new' ? '' : $('aC').value, area: $('aA').value.trim(), start: $('aS').value, end: $('aE').value };
+    if (!o.name || !o.start){ toast('ใส่ชื่องานและวันเริ่มก่อน'); return; }
+    closeSheet(); toast('กำลังเพิ่ม…'); const d = await run('addPlanTask', o); if (d) toast('เพิ่มงานแล้ว ✓');
+  };
+}
+function taskRow(x){
+  return `<div class="task"><div class="tn">${esc(x.p.name)}
+    <small>${esc(catName(x.p.cat))}${x.p.area?' · '+esc(x.p.area):''} · ${rangeTxt(x.p)}${x.dayIdx?` · วันที่ ${x.dayIdx}/${x.days.length}`:''}${(x.p.origEnd&&x.p.end!==x.p.origEnd)?' · เลื่อนจาก '+thai(x.p.origEnd):''}</small></div>
+    ${stChip(x)}<button class="more" data-ptask="${x.p.id}" aria-label="เมนู">⋯</button></div>`;
+}
+function planAct(id, action, arg){
+  const p = S.data.plan.find(x=>x.id===id); if (!p) return;
+  const msg = {start:'▶ เริ่มแล้ว', done:'✅ จบแล้ว', todo:'↩️ ยังไม่เริ่ม', extend:'➕ ต่อวันแล้ว', shift:'⏭ เลื่อนแล้ว', dates:'📅 บันทึกวันแล้ว'}[action];
+  if (action==='start') p.status='doing'; else if (action==='done') p.status='done'; else if (action==='todo') p.status='todo';
+  else if (action==='extend') { const t=S.data.today; if (p.end < t) p.end = nonWork(t)?addWork(t,1):t; else p.end = addWork(p.end,1); if (p.status==='todo' && p.start<=t) p.status='doing'; }
+  else if (action==='shift') { const len=Math.max(1,workCount(p.start,p.end)); const from=p.start<S.data.today?S.data.today:p.start; p.start=addWork(from,1); p.end=len>1?addWork(p.start,len-1):p.start; p.status='todo'; }
+  render(); toast(msg);
+  run('planUpdate', id, action, arg||{});
+}
+function nonWork(d){ const w=dow(d); return w===0||w===6||(S.data.holidays||[]).indexOf(d)>=0; }
+function addWork(d,n){ let k=0,g=0; while(k<n && g++<400){ d=addDays(d,1); if(!nonWork(d)) k++; } return d; }
+function workCount(s,e){ let c=0,g=0; for(let d=s; d<=e && g++<400; d=addDays(d,1)) if((S.data.holidays||[]).indexOf(d)<0) c++; return c; }
+function planDates(id){
+  const p = S.data.plan.find(x=>x.id===id); if (!p) return;
+  openSheet(`<h2>📅 ${esc(p.name)}</h2>
+    <div class="field"><label>วันเริ่ม</label><input type="date" id="pS" value="${p.start}"></div>
+    <div class="field"><label>วันจบ</label><input type="date" id="pE" value="${p.end}"></div>
+    <div class="hint" style="margin-bottom:10px">แผนเดิม: ${rangeTxt({start:p.origStart,end:p.origEnd})} · งานที่ต่อจากงานนี้จะไม่เลื่อนตาม (ถึงวันแล้วแอปจะถามอีกที)</div>
+    <div class="pv-row"><button class="btn primary" id="pSave" style="flex:1">บันทึก</button><button class="btn ghost" id="pCancel">ปิด</button></div>`);
+  $('pSave').onclick = () => { const a={start:$('pS').value,end:$('pE').value}; Object.assign(p,a); closeSheet(); planAct(id,'dates',a); };
+  $('pCancel').onclick = closeSheet;
+}
+function planMenu(id){
+  const p = S.data.plan.find(x=>x.id===id); if (!p) return;
+  const x = planDerive().find(y=>y.p.id===id);
+  openSheet(`<h2>${catEmoji(p.cat)} ${esc(p.name)}</h2>
+    <div class="hint" style="margin:-6px 0 12px">${esc(p.area)} · ${rangeTxt(p)} · ${x.days.length} วันทำงาน ${x.depsOpen.length?'<br>⚠️ รอ: '+x.depsOpen.map(d=>esc(d.name)).join(', '):''}</div>
+    <div class="menu">
+      ${p.status!=='doing'&&p.status!=='done'?'<button data-m="start">▶ เริ่มแล้ว</button>':''}
+      ${p.status!=='done'?'<button data-m="done">✅ จบแล้ว</button>':''}
+      ${p.status!=='todo'?'<button data-m="todo">↩️ เปลี่ยนเป็นยังไม่เริ่ม</button>':''}
+      ${p.status!=='done'?'<button data-m="extend">➕ ต่อวันจบ 1 วันทำงาน</button><button data-m="shift">⏭ เลื่อนทั้งงาน 1 วันทำงาน</button>':''}
+      <button data-m="dates">📅 แก้วันเริ่ม/จบ</button>
+      <button data-m="del" class="red">🗑 ลบงานนี้ออกจากแผน</button>
+      <button data-m="close">ปิด</button></div>`);
+  $('sheet').querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+    const m = b.dataset.m; closeSheet();
+    if (m==='dates') planDates(id);
+    else if (m==='del'){ if (confirm('ลบ "'+p.name+'" ออกจากแผน?')){ S.data.plan = S.data.plan.filter(x=>x.id!==id); render(); run('deletePlanTask', id); } }
+    else if (m!=='close') planAct(id, m, {n:1});
+  });
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab],[data-pa],[data-ptask],[data-day],[data-fab],[data-people],[data-calall],[data-asksall]'); if (!t) return;
+  if (t.dataset.tab){ S.tab=t.dataset.tab; try{localStorage.setItem('tab',S.tab);}catch(err){} render(); window.scrollTo({top:0}); }
+  else if (t.dataset.fab){ if (S.tab==='plan') addPlanSheet(); else { window.scrollTo({top:0,behavior:'smooth'}); setTimeout(()=>ta.focus(),250); } }
+  else if (t.dataset.people) peopleSheet();
+  else if (t.dataset.calall){ S.calAll=!S.calAll; renderPlan(); }
+  else if (t.dataset.asksall){ S.asksAll=!S.asksAll; renderPlan(); }
+  else if (t.dataset.pa){ if (t.dataset.pa==='dates') planDates(t.dataset.id); else planAct(t.dataset.id, t.dataset.pa, {n:1}); }
+  else if (t.dataset.ptask) planMenu(t.dataset.ptask);
+  else if (t.dataset.day){ S.selDay = t.dataset.day; renderPlan(); }
+});
+
+/* ================= start ================= */
+load();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && !S.preview) load(); });
+</script>
+</body>
+</html>
