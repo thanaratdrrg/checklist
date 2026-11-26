@@ -480,6 +480,109 @@
   .mvd:not(.old) b{background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
   .stat.on{border-color:rgba(29,33,39,.4)} .stat.green.on{outline:none}
   .card{padding-bottom:24px}
+  /* ================= คอม — บอร์ด + แกนต์ (Silver) ================= */
+  #deskSide{display:none}
+  @media (min-width:1100px){
+    body{padding:0}
+    .nav{display:none!important}
+    #deskSide{display:flex;flex-direction:column;gap:4px;position:fixed;left:16px;top:16px;bottom:16px;width:244px;z-index:12;padding:18px 14px;overflow:auto;
+      border-radius:26px;background:rgba(255,255,255,.38);-webkit-backdrop-filter:blur(24px) saturate(1.3);backdrop-filter:blur(24px) saturate(1.3);border:var(--edge);box-shadow:var(--sh)}
+    .wrap{max-width:none;margin:0 0 0 276px;padding:22px 28px 40px 8px}
+    header.top{position:static;margin-bottom:12px}
+    .projpill{display:none}
+    .sbrand{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+    .sbrand .lg{width:38px;height:38px;border-radius:12px;background:var(--graphite);display:grid;place-items:center;box-shadow:0 6px 14px rgba(20,25,30,.25)}
+    .sbrand b{display:block;font-size:15px}
+    .sbrand small{font:500 9px var(--mono);letter-spacing:.14em;color:var(--sub)}
+    .sdate{display:flex;align-items:baseline;gap:8px;margin:2px 4px 10px}
+    .sdate b{font-size:40px;font-weight:700;line-height:1;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .sdate span{color:var(--sub);font-size:13px}
+    .slab{font:500 9.5px var(--mono);letter-spacing:.16em;color:#9aa2ac;margin:12px 6px 4px;text-transform:uppercase}
+    .sv{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:14px;border:1px solid transparent;background:none;color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+    .sv svg{width:18px;height:18px;flex:none;color:var(--sub)}
+    .sv span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sv em{font-style:normal;font:600 11px var(--mono);color:var(--sub);min-width:22px;text-align:right}
+    .sv em.hot{color:var(--teal)}
+    .sv:hover{background:rgba(255,255,255,.4)}
+    .sv.on{background:rgba(255,255,255,.7);border:var(--edge);box-shadow:var(--sh)}
+    .sv.on svg{color:var(--teal)}
+    .sstat{font-size:12.5px;color:var(--sub);padding:3px 10px;display:flex;gap:8px;align-items:center}
+    .sstat i{width:7px;height:7px;border-radius:50%;background:#9aa2ac;flex:none}
+    .sstat i.ok{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+    .skeys{margin-top:auto;padding:10px 6px 0;font-size:11.5px;color:var(--sub);line-height:1.9}
+    .skeys kbd{font:500 10px var(--mono);padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.6);border:var(--edge);margin-right:4px}
+    /* บอร์ด */
+    #checkView{display:grid;grid-template-columns:minmax(0,1fr) 300px;column-gap:22px;align-items:start}
+    #checkView>*{grid-column:1}
+    #checkView>.hero,#checkView>.asks{display:none}
+    #deskRail{grid-column:2;grid-row:1 / span 8;position:sticky;top:16px;display:flex;flex-direction:column;gap:12px}
+    #checkView .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .board{display:flex;gap:14px;align-items:flex-start}
+    .bcol{flex:1 1 0;min-width:0}
+    .bcol.empty{flex:0 0 150px}
+    .bcol .card{padding:14px 14px 24px}
+    .bcol .card-title{font-size:15.5px}
+    .bcol{min-height:140px;border-radius:22px;padding:10px;background:rgba(255,255,255,.18);border:1px dashed rgba(150,160,172,.35);transition:background .15s}
+    .bcol.over{background:rgba(22,181,154,.10);border-color:var(--teal)}
+    .bcol h3{display:flex;align-items:center;gap:8px;margin:2px 4px 10px;font-size:13.5px}
+    .bcol h3 i{width:8px;height:8px;border-radius:50%;background:#9aa2ac}
+    .bcol.c-over h3 i{background:var(--red)} .bcol.c-now h3 i{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+    .bcol h3 em{font-style:normal;font:600 11px var(--mono);color:var(--sub);margin-left:auto}
+    .bcol .card{margin-bottom:10px;cursor:grab}
+    .bcol .hintdrop{font-size:11.5px;color:var(--sub);text-align:center;padding:10px 4px}
+    .board.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+    .board.grid3 .card{margin:0}
+    .rcard{border-radius:22px;padding:14px 16px;background:var(--card);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:var(--edge);box-shadow:var(--sh)}
+    .rcard h4{margin:0 0 8px;font:500 9.5px var(--mono);letter-spacing:.16em;color:#9aa2ac;text-transform:uppercase}
+    .rcard .rbig{font-size:44px;font-weight:700;line-height:1;background:var(--chrome);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .rcard .rbig small{font-size:18px}
+    .rcard .rsub{color:var(--sub);font-size:12.5px;margin-top:4px}
+    .rcard .bar{height:6px;border-radius:6px;background:rgba(150,160,172,.25);margin-top:10px;overflow:hidden}
+    .rcard .bar i{display:block;height:100%;background:linear-gradient(90deg,#16b59a,#5fd6c0);box-shadow:0 0 10px rgba(22,181,154,.6)}
+    #deskRail .qcard{margin:0}
+    .who2{display:flex;align-items:center;gap:10px;width:100%;padding:7px 4px;border:0;background:none;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer;text-align:left;border-radius:10px}
+    .who2:hover,.who2.on{background:rgba(255,255,255,.5)}
+    .who2 .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--graphite);color:#fff;font-size:12px;flex:none}
+    .who2 span{flex:1} .who2 em{font-style:normal;font:600 11px var(--mono);color:var(--sub)}
+    .rlink{border:0;background:none;color:var(--teal);font:inherit;font-size:12.5px;cursor:pointer;padding:6px 0 0}
+    /* แผนงาน */
+    #planView{max-width:none}
+    #planView .calbox,#planView .daybox,#planView .cats{display:none}
+    .pasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:12px 0}
+    .pasks .qcard{margin:0}
+    .gwrap{overflow:auto;border-radius:24px;background:var(--card);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border:var(--edge);box-shadow:var(--sh);margin:12px 0;max-height:calc(100vh - 220px)}
+    .gantt{--cw:34px;min-width:max-content;position:relative}
+    .gr{display:grid;grid-template-columns:230px repeat(var(--n),var(--cw));align-items:center}
+    .ghead{position:sticky;top:0;z-index:3;background:rgba(240,242,245,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .ghead .gd{text-align:center;font:500 11px var(--mono);color:var(--sub);padding:6px 0 7px;line-height:1.25}
+    .ghead .gd b{display:block;font-size:12.5px;color:var(--ink)}
+    .ghead .gd.off b{color:#b2b8bf} .ghead .gd.now b{color:var(--teal)}
+    .ghead .gm{font:600 11px var(--mono);color:var(--ink);padding:0 0 0 2px;white-space:nowrap}
+    .gname{position:sticky;left:0;z-index:2;background:rgba(241,243,246,.97);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);padding:0 12px;height:100%;display:flex;align-items:center;font-size:13px;border-right:1px solid var(--line);min-width:0}
+    .gname span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .gbody{position:relative}
+    .gbg{position:absolute;inset:0;z-index:0;pointer-events:none}
+    .gbg i{border-left:1px solid rgba(150,160,172,.16);height:100%}
+    .gbg i.off{background:repeating-linear-gradient(135deg,rgba(150,160,172,.12) 0 4px,transparent 4px 8px)}
+    .gbg i.now{background:rgba(22,181,154,.10);border-left:2px solid var(--teal)}
+    .gcat{position:relative;z-index:1;height:34px}
+    .gcat .gname{font-weight:600;gap:8px}
+    .gcat .gname .cn{font:600 10.5px var(--mono);width:20px;height:20px;border-radius:7px;display:grid;place-items:center;background:var(--graphite);color:#fff;flex:none}
+    .grow{position:relative;z-index:1;height:38px}
+    .grow .gname{color:var(--sub);padding-left:40px}
+    .gbar{height:24px;border-radius:9px;margin:0 2px;padding:0 8px;display:flex;align-items:center;font-size:11.5px;white-space:nowrap;overflow:hidden;cursor:grab;user-select:none;touch-action:none;
+      background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(214,220,228,.6));border:1px solid rgba(255,255,255,.95);box-shadow:inset 0 -2px 4px rgba(130,145,165,.25),0 2px 6px rgba(40,50,70,.10);color:var(--ink)}
+    .gbar.s-done{background:var(--graphite);color:#cfd4da;border-color:#2a2e34}
+    .gbar.s-active,.gbar.s-ending{background:linear-gradient(180deg,#3ed1b6,#139e86);color:#fff;border-color:rgba(255,255,255,.6);box-shadow:0 4px 14px rgba(22,181,154,.45)}
+    .gbar.s-overdue{background:linear-gradient(180deg,#e8705f,#c43b2c);color:#fff;border-color:rgba(255,255,255,.6)}
+    .gbar.drag{cursor:grabbing;opacity:.85;outline:2px dashed var(--teal);outline-offset:2px}
+    .glegend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin:4px 4px 10px}
+    .glegend i{display:inline-block;width:14px;height:9px;border-radius:3px;margin-right:6px;vertical-align:middle;background:linear-gradient(180deg,#fff,#d6dce4);border:1px solid #fff}
+    .glegend i.d{background:#25292f} .glegend i.a{background:#16b59a} .glegend i.l{background:#d2493a}
+    .glegend i.h{background:repeating-linear-gradient(135deg,rgba(150,160,172,.4) 0 3px,transparent 3px 6px)}
+    .gtip{font-size:12px;color:var(--sub);margin:0 4px}
+    .modal .sheet{max-width:520px}
+  }
   #setup{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:24px}
   #setup .sbox{width:min(380px,100%);background:var(--card);border-radius:28px;padding:24px;box-shadow:var(--sh);text-align:center}
   #setup .slogo img{width:72px;height:72px;border-radius:18px}
@@ -713,7 +816,7 @@ function render(){
     (a.t.date && b.t.date ? a.t.date.localeCompare(b.t.date) : 0) || (Number(a.t.order)-Number(b.t.order)));
   if (S.filter==='done') list.sort((a,b) => (b.t.doneAt||'').localeCompare(a.t.doneAt||''));
 
-  $('list').innerHTML = list.length ? list.map(cardHtml).join('')
+  $('list').innerHTML = isDesk() ? boardHtml(list) : list.length ? list.map(cardHtml).join('')
     : `<div class="empty">${S.filter==='done' ? 'ยังไม่มีงานที่เสร็จ' : '🎉 ไม่มีงานในมุมมองนี้'}</div>`;
 
   renderPreview();
@@ -1182,6 +1285,7 @@ function renderPlan(){
   const D = planDerive(), today = S.data.today;
   const asks = D.filter(x => x.askStart || x.askEnd);
   renderTabs(asks.length);
+  renderDesk(D, asks);
 
   if (S.tab==='check'){
     $('asks').innerHTML = asks.length ? `<button class="banner" data-tab="plan"><i class="bd"></i><span class="bt">
@@ -1253,14 +1357,15 @@ function renderPlan(){
       <button class="fabsm" id="btnAddPlan" aria-label="เพิ่มงานในแผน">${IC.plusS}</button></div>
     <div class="pct"><div class="big">${pct}<small>%</small></div><div class="pr">
       <div class="pl"><span>ความคืบหน้า</span><span>อีก ${left} วัน</span></div><div class="segs">${segs}</div></div></div>
-    ${cal}
-    ${(S.asksAll?asks:asks.slice(0,2)).map(askCard).join('')}
-    ${asks.length>2 ? `<button class="qmore" data-asksall="1">${S.asksAll?'ย่อ':'ดูคำถามอีก '+(asks.length-2)+' เรื่อง'}</button>` : ''}
+    ${isDesk() ? deskPlanHtml(D, asks, first, last) : cal}
+    ${isDesk() ? '' : (S.asksAll?asks:asks.slice(0,2)).map(askCard).join('')}
+    ${!isDesk() && asks.length>2 ? `<button class="qmore" data-asksall="1">${S.asksAll?'ย่อ':'ดูคำถามอีก '+(asks.length-2)+' เรื่อง'}</button>` : ''}
     ${dayBox}
     <div class="cats">${catHtml}</div>
     <div class="plinks"><button class="btn ghost" id="btnSyncCal">ซิงค์ Google Calendar ตอนนี้</button></div>`;
   $('btnAddPlan').onclick = addPlanSheet;
   $('psub').onclick = projSheet;
+  if (isDesk()) bindGantt();
   $('planView').querySelectorAll('details.catrow').forEach(el => el.addEventListener('toggle', () => { S.catOpen = S.catOpen||{}; S.catOpen[el.dataset.cat] = el.open; }));
   $('btnSyncCal').onclick = async () => { toast('กำลังซิงค์…'); try{ toast(await call('syncCalendarNow')); }catch(e){ fail(e); } };
 }
@@ -1344,6 +1449,161 @@ document.addEventListener('click', e => {
 /* ================= start ================= */
 load();
 document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && !S.preview) load(); });
+/* ================= คอม — บอร์ด + แกนต์ ================= */
+const DESKQ = window.matchMedia('(min-width:1100px)');
+function isDesk(){ return DESKQ.matches; }
+try{ DESKQ.addEventListener('change', () => render()); }catch(e){ DESKQ.addListener(() => render()); }
+
+function boardHtml(list){
+  if (!list.length) return `<div class="empty">${S.filter==='done' ? 'ยังไม่มีงานที่เสร็จ' : '🎉 ไม่มีงานในมุมมองนี้'}</div>`;
+  if (S.filter==='done') return `<div class="board grid3">${list.map(cardHtml).join('')}</div>`;
+  const cols = [
+    ['over','เลยกำหนด', x => !x.blocked && x.ds==='overdue', 'วางที่นี่ = เลื่อนเป็นวันนี้'],
+    ['now','วันนี้ – พรุ่งนี้', x => !x.blocked && (x.ds==='today'||x.ds==='tomorrow'), 'วางที่นี่ = นัดวันนี้'],
+    ['next','กำลังมา', x => !x.blocked && x.ds==='upcoming', 'วางที่นี่ = เลือกวัน'],
+    ['none','ยังไม่ได้วัน / รอ', x => x.blocked || x.ds==='none', 'วางที่นี่ = ล้างวัน'],
+  ];
+  return `<div class="board">${cols.map(([k,l,f,h]) => { const it = list.filter(f);
+    return `<div class="bcol c-${k} ${it.length?'':'empty'}" data-col="${k}"><h3><i></i>${l}<em>${it.length}</em></h3>
+      ${it.map(x => cardHtml(x).replace('class="card', `draggable="true" data-drag="${x.t.id}" class="card`)).join('') || `<div class="hintdrop">${h}</div>`}</div>`; }).join('')}</div>`;
+}
+let dragId = '';
+document.addEventListener('dragstart', e => { const c = e.target.closest && e.target.closest('[data-drag]'); if (!c) return; dragId = c.dataset.drag; e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', dragId); }catch(err){} });
+document.addEventListener('dragover', e => { const c = e.target.closest && e.target.closest('[data-col]'); if (!c || !dragId) return; e.preventDefault();
+  document.querySelectorAll('.bcol.over').forEach(x => x!==c && x.classList.remove('over')); c.classList.add('over'); });
+document.addEventListener('dragend', () => { dragId=''; document.querySelectorAll('.bcol.over').forEach(x => x.classList.remove('over')); });
+document.addEventListener('drop', e => {
+  const c = e.target.closest && e.target.closest('[data-col]'); if (!c || !dragId) return; e.preventDefault();
+  const id = dragId; dragId=''; c.classList.remove('over');
+  const t = S.data.topics.find(x => x.id===id); if (!t) return;
+  const k = c.dataset.col, today = S.data.today;
+  if (k==='next') return dateSheet(id);
+  const v = k==='none' ? '' : today;
+  if (k==='over' && t.date && t.date < today) return;
+  if (t.date===v) return;
+  t.date = v; t.updatedAt = new Date().toISOString(); render();
+  toast(v ? '📅 นัดเป็นวันนี้แล้ว' : 'ล้างวันแล้ว');
+  run('updateTopic', id, {date:v});
+});
+
+function projPct(id){
+  const D = (S.data.plan||[]).filter(p => p.projectId===id); let a=0, d=0;
+  D.forEach(p => { const w = Math.max(1, workDays(p.start,p.end).length); a+=w; if (p.status==='done') d+=w; });
+  return a ? Math.round(d*100/a)+'%' : '';
+}
+function renderDesk(D, asks){
+  let side = $('deskSide');
+  if (!side){ side = document.createElement('aside'); side.id='deskSide'; document.body.prepend(side); }
+  if (!isDesk()){ side.innerHTML=''; const r=$('deskRail'); if (r) r.innerHTML=''; return; }
+  const all = derive(), act = all.filter(x=>!x.done), today = S.data.today, p = today.split('-').map(Number);
+  const people = [...new Set(act.flatMap(x => x.pendingContacts))];
+  const cur = curProject(), st = S.data.settings || {};
+  const onDone = S.tab==='check' && S.filter==='done';
+  side.innerHTML = `<div class="sbrand"><span class="lg">${IC.check.replace('currentColor','#fff')}</span><div><b>เช็คลิสต์หน้างาน</b><small>PROTOTYPE · 02</small></div></div>
+    <div class="sdate"><b>${p[2]}</b><span>${DOW[dow(today)]} · ${MON[p[1]-1]} ${p[0]+543}</span></div>
+    <div class="slab">มุมมอง</div>
+    <button class="sv ${S.tab==='check'&&!onDone?'on':''}" data-deskview="check">${IC.check}<span>บอร์ดเช็คลิสต์</span><em>${act.length}</em></button>
+    <button class="sv ${S.tab==='plan'?'on':''}" data-tab="plan">${IC.cal}<span>แผนงาน (แกนต์)</span><em class="${asks.length?'hot':''}">${asks.length?asks.length+' ถาม':''}</em></button>
+    <button class="sv" data-people="1">${IC.person}<span>ผู้ประสานงาน</span><em>${people.length}</em></button>
+    <button class="sv ${onDone?'on':''}" data-deskview="done">${IC.check}<span>เสร็จแล้ว</span><em>${all.length-act.length}</em></button>
+    <div class="slab">โปรเจกต์</div>
+    ${projects().map(pr => `<button class="sv ${pr.id===cur?'on':''}" data-proj="${pr.id}"><span>🏠 ${esc(pr.name)}</span><em>${projPct(pr.id)}</em></button>`).join('')}
+    ${projects().length>1 ? `<button class="sv ${!cur?'on':''}" data-proj="all"><span>ทุกโปรเจกต์</span></button>` : ''}
+    <button class="sv" data-projnew="1"><span style="color:var(--sub)">+ โปรเจกต์ใหม่</span></button>
+    <div class="slab">สถานะ</div>
+    <div class="sstat"><i class="${st.hasBark?'ok':''}"></i>แจ้งเตือน Bark ${st.hasBark?'✓':'— ยังไม่เชื่อม'}</div>
+    <div class="sstat"><i class="ok"></i>สรุปเช้า 08:00 · เย็น 16:30</div>
+    <div class="skeys"><kbd>Ctrl K</kbd>พิมพ์งานใหม่<br><kbd>Ctrl V</kbd>วางรูปแคปแชท<br><kbd>1</kbd><kbd>2</kbd>สลับบอร์ด / แผนงาน</div>`;
+
+  let rail = $('deskRail');
+  if (!rail){ rail = document.createElement('div'); rail.id='deskRail'; $('checkView').appendChild(rail); }
+  if (S.tab!=='check'){ rail.innerHTML=''; return; }
+  let html = '';
+  if (D.length){
+    const pct = progress(D), last = D.reduce((m,x)=>x.p.end>m?x.p.end:m, D[0].p.end);
+    const left = Math.max(0, Math.round((Date.parse(last)-Date.parse(today))/86400000));
+    html += `<div class="rcard"><h4>ความคืบหน้าโปรเจกต์</h4><div class="rbig">${pct}<small>%</small></div>
+      <div class="rsub">ส่งมอบ ${thai(last,true)} · อีก ${left} วัน</div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+  }
+  if (asks.length){
+    html += `<div class="rcard"><h4>แผนงานรอคำตอบ · ${asks.length}</h4><div style="display:flex;flex-direction:column;gap:10px">${asks.slice(0,3).map(askCard).join('')}</div>
+      ${asks.length>3?`<button class="rlink" data-tab="plan">ดูอีก ${asks.length-3} เรื่องในแผนงาน →</button>`:''}</div>`;
+  }
+  if (people.length){
+    const cnt = n => act.filter(x => x.pendingContacts.includes(n)).length;
+    html += `<div class="rcard"><h4>รอใครอยู่</h4>${people.sort((a,b)=>cnt(b)-cnt(a)).map(n =>
+      `<button class="who2 ${S.person===n?'on':''}" data-person="${esc(n)}"><span class="av">${esc(n.replace(/^(คุณ|ช่าง|พี่|น้อง|เฮีย|เจ๊)/,'').slice(0,1)||n.slice(0,1))}</span><span>${esc(n)}</span><em>${cnt(n)}</em></button>`).join('')}
+      ${S.person?`<button class="rlink" data-person="">ดูทุกคน</button>`:''}</div>`;
+  }
+  rail.innerHTML = html;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-deskview]'); if (!t) return;
+  S.tab='check'; S.filter = t.dataset.deskview==='done' ? 'done' : 'active';
+  try{ localStorage.setItem('tab','check'); }catch(err){} render(); window.scrollTo({top:0});
+});
+document.addEventListener('keydown', e => {
+  if (!isDesk()) return;
+  const typing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.isContentEditable;
+  if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault();
+    if (S.tab!=='check'){ S.tab='check'; render(); } setTimeout(()=>ta.focus(), 30); return; }
+  if (typing || e.ctrlKey || e.metaKey || e.altKey || !$('modal').classList.contains('hidden')) return;
+  if (e.key==='1' || e.key==='2'){ S.tab = e.key==='1'?'check':'plan'; try{localStorage.setItem('tab',S.tab);}catch(err){} render(); }
+});
+
+/* แกนต์ */
+function deskPlanHtml(D, asks, first, last){
+  const today = S.data.today, days = [];
+  const from = addDays(first, -((dow(first)+6)%7)), to = addDays(last, 6-((dow(last)+6)%7));
+  for (let d=from, g=0; d<=to && g<400; d=addDays(d,1), g++) days.push(d);
+  const ix = d => days.indexOf(d);
+  const H = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  let head = `<div class="gr ghead"><div class="gname"><span>งาน</span></div>`;
+  days.forEach((d,i) => { const m = i===0 || d.slice(8)==='01';
+    head += `<div class="gd ${isNonWork(d)?'off':''} ${d===today?'now':''}">${m?`<span class="gm">${MON[Number(d.slice(5,7))-1]}</span>`:'&nbsp;'}<b>${Number(d.slice(8))}</b>${H[dow(d)]}</div>`; });
+  head += '</div>';
+  const bg = `<div class="gbg gr"><span></span>${days.map(d=>`<i class="${d===today?'now':isNonWork(d)?'off':''}" title="${esc((S.data.holidayNames||{})[d]||'')}"></i>`).join('')}</div>`;
+  const cats = (S.data.planCats||[]).filter(c => D.some(x=>x.p.cat===c));
+  if (D.some(x=>!x.p.cat)) cats.push('');
+  let rows = '';
+  cats.forEach((c,ci) => {
+    rows += `<div class="gr gcat"><div class="gname"><span class="cn">${ci+1}</span><span>${esc(catName(c))}</span></div></div>`;
+    D.filter(x=>(x.p.cat||'')===c).forEach(x => {
+      const a = Math.max(0, ix(x.p.start)), b = ix(x.p.end) < 0 ? days.length-1 : ix(x.p.end);
+      const s = x.done ? 'done' : x.state==='upcoming' && x.p.status!=='doing' ? 'todo' : x.state;
+      rows += `<div class="gr grow"><div class="gname" title="${esc(x.p.name)}"><span>${esc(x.p.name)}</span></div>
+        <div class="gbar s-${s}" style="grid-column:${a+2}/${b+3}" data-gbar="${x.p.id}" title="${esc(x.p.name)} · ${rangeTxt(x.p)}">${esc(shortName(x.p.name))}</div></div>`;
+    });
+  });
+  return `${asks.length?`<div class="pasks">${asks.map(askCard).join('')}</div>`:''}
+    <div class="gtip">ลากแถบเพื่อเลื่อนวัน (ข้ามเสาร์-อาทิตย์/วันหยุดให้เอง) · คลิกแถบเพื่อเปิดเมนู</div>
+    <div class="gwrap"><div class="gantt" style="--n:${days.length}">${head}<div class="gbody">${bg}${rows}</div></div></div>
+    <div class="glegend"><span><i class="d"></i>เสร็จแล้ว</span><span><i class="a"></i>กำลังทำ</span><span><i class="l"></i>เลยกำหนด</span><span><i></i>ยังไม่เริ่ม</span><span><i class="h"></i>วันหยุด / เสาร์-อาทิตย์</span></div>`;
+}
+function bindGantt(){
+  const wrap = document.querySelector('.gwrap'); if (!wrap) return;
+  const now = wrap.querySelector('.ghead .gd.now');
+  if (now && !S.ganttScrolled){ S.ganttScrolled = 1; wrap.scrollLeft = Math.max(0, now.offsetLeft - 230 - 34*6); }
+  wrap.querySelectorAll('[data-gbar]').forEach(bar => {
+    bar.onpointerdown = ev => {
+      const x0 = ev.clientX, cw = 34; let moved = 0;
+      bar.setPointerCapture(ev.pointerId);
+      bar.onpointermove = m => { const dx = m.clientX - x0; if (Math.abs(dx) > 4){ moved = 1; bar.classList.add('drag'); }
+        bar.style.transform = `translateX(${Math.round(dx/cw)*cw}px)`; };
+      bar.onpointerup = u => {
+        bar.onpointermove = bar.onpointerup = null; bar.classList.remove('drag'); bar.style.transform='';
+        const id = bar.dataset.gbar, n = Math.round((u.clientX - x0)/cw);
+        if (!moved || !n) return planMenu(id);
+        const p = S.data.plan.find(q=>q.id===id); if (!p) return;
+        const len = Math.max(1, workCount(p.start,p.end));
+        let s = addDays(p.start, n); let g=0; while (nonWork(s) && g++<14) s = addDays(s, n>0?1:-1);
+        const a = { start:s, end: len>1 ? addWork(s, len-1) : s };
+        Object.assign(p, a); planAct(id, 'dates', a);
+        toast(`📅 ${shortName(p.name)} → ${rangeTxt(p)}`);
+      };
+    };
+  });
+}
 </script>
 </body>
 </html>
