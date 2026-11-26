@@ -583,6 +583,20 @@
     .gtip{font-size:12px;color:var(--sub);margin:0 4px}
     .modal .sheet{max-width:520px}
   }
+  @media (min-width:1100px){
+    .board{overflow-x:auto;padding-bottom:6px}
+    .bcol{min-width:250px}
+    .bcol.empty{flex:0 0 160px;min-width:160px}
+  }
+  @media (min-width:1100px) and (max-width:1549px){
+    #checkView{display:flex;flex-direction:column;gap:0}
+    #checkView>.stats{order:1}#checkView>.composer{order:2}#deskRail{order:3}#checkView>#preview{order:4}#checkView>.sechead{order:5}#checkView>#list{order:6}
+    #deskRail{position:static;flex-direction:row;flex-wrap:wrap;align-items:stretch;margin:12px 0 0}
+    #deskRail>.rcard{flex:1 1 280px}
+    #checkView>*{width:100%;align-self:stretch}
+    #deskRail>.rcard:has(.qcard){display:none}
+    #checkView>.asks{display:block;order:3;margin-top:12px}
+  }
   #setup{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:24px}
   #setup .sbox{width:min(380px,100%);background:var(--card);border-radius:28px;padding:24px;box-shadow:var(--sh);text-align:center}
   #setup .slogo img{width:72px;height:72px;border-radius:18px}
