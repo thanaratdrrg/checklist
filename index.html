@@ -518,6 +518,7 @@
     #deskRail{grid-column:2;grid-row:1 / span 8;position:sticky;top:16px;display:flex;flex-direction:column;gap:12px}
     #checkView .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
     .board{display:flex;gap:14px;align-items:flex-start}
+    .pslist{columns:2;column-gap:24px}.pslist li{break-inside:avoid}
     .bcol{flex:1 1 0;min-width:0}
     .bcol.empty{flex:0 0 150px}
     .bcol .card{padding:14px 14px 24px}
@@ -590,13 +591,26 @@
   }
   @media (min-width:1100px) and (max-width:1549px){
     #checkView{display:flex;flex-direction:column;gap:0}
-    #checkView>.stats{order:1}#checkView>.composer{order:2}#deskRail{order:3}#checkView>#preview{order:4}#checkView>.sechead{order:5}#checkView>#list{order:6}
+    #checkView>.stats{order:1}#checkView>.composer{order:2}#deskRail{order:3}#checkView>#preview{order:4}#checkView>.sechead{order:5}#checkView>#list{order:6}#checkView>#psum{order:6}
     #deskRail{position:static;flex-direction:row;flex-wrap:wrap;align-items:stretch;margin:12px 0 0}
     #deskRail>.rcard{flex:1 1 280px}
     #checkView>*{width:100%;align-self:stretch}
     #deskRail>.rcard:has(.qcard){display:none}
     #checkView>.asks{display:block;order:3;margin-top:12px}
   }
+  .psum{margin:0 0 14px;padding:14px 16px;border-radius:22px;background:rgba(255,255,255,.72);box-shadow:var(--sh)}
+  .pshead{display:flex;align-items:center;gap:10px}
+  .pshead>div{flex:1;min-width:0}.pshead b{display:block;font:700 15px 'IBM Plex Sans Thai',sans-serif}
+  .pshead small{font-size:12px;color:#8a857c}.pshead em{font-style:normal;color:var(--red,#d0452f);font-weight:600}
+  .psum .av{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:600 14px 'IBM Plex Sans Thai',sans-serif;flex:none}
+  .pslist{list-style:none;margin:10px 0 0;padding:0;counter-reset:ps}
+  .pslist li{counter-increment:ps;padding:9px 0 9px 26px;border-top:1px solid rgba(0,0,0,.06);position:relative}
+  .pslist li::before{content:counter(ps);position:absolute;left:0;top:10px;width:18px;height:18px;border-radius:50%;background:#e6e2db;font:600 11px/18px 'IBM Mono',monospace;text-align:center;color:#5a564e}
+  .pslist li.overdue::before{background:#f6d9d3;color:#c23b22}.pslist li.today::before,.pslist li.tomorrow::before{background:#d6efe7;color:#16866a}
+  .pst{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:14px}
+  .pst i{font-style:normal;font-weight:500;font-size:12px;color:#8a857c;white-space:nowrap}
+  .pslist li.overdue .pst i{color:#c23b22}.pslist li.today .pst i,.pslist li.tomorrow .pst i{color:#16866a}
+  .pss{font-size:13px;color:#4b4740;margin-top:3px}.pss::before{content:'– ';color:#aaa}
   /* เก็บขอบให้เรียบ */
   :root{--edge:1px solid rgba(255,255,255,.7);
     --sh:inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(40,50,70,.05), 0 10px 26px rgba(40,50,70,.07)}
@@ -661,6 +675,7 @@
     </div>
     <div id="preview"></div>
     <div class="sechead"><b>ต้องทำต่อ</b><div class="chips" id="chips"></div></div>
+    <div id="psum"></div>
     <div id="list"><div class="loading"><span class="spin"></span>กำลังโหลด…</div></div>
   </div>
 </div>
@@ -861,9 +876,46 @@ function render(){
   $('list').innerHTML = isDesk() ? boardHtml(list) : list.length ? list.map(cardHtml).join('')
     : `<div class="empty">${S.filter==='done' ? 'ยังไม่มีงานที่เสร็จ' : '🎉 ไม่มีงานในมุมมองนี้'}</div>`;
 
+  $('psum').innerHTML = S.person ? personSumHtml(S.person, act) : '';
   renderPreview();
   renderPlan();
 }
+
+/* สรุปงานของคนที่เลือก */
+function personItems(p, act){
+  const hit = s => s.done!=='1' && (s.contact===p || (s.text||'').includes(p));
+  return act.map(x => ({ x, steps: x.steps.filter(hit) })).filter(o => o.steps.length)
+    .sort((a,b) => (a.x.blocked-b.x.blocked) || (RANK[a.x.ds]-RANK[b.x.ds]) || (a.x.t.date||'9').localeCompare(b.x.t.date||'9'));
+}
+function dueWord(x){
+  if (x.blocked) return 'รอ '+x.dep.title;
+  return { overdue:'เลยกำหนด '+thai(x.t.date), today:'วันนี้', tomorrow:'พรุ่งนี้', upcoming: x.t.date ? 'ภายใน '+thai(x.t.date) : '', none:'ยังไม่ได้วัน' }[x.ds];
+}
+function personSumHtml(p, act){
+  const items = personItems(p, act);
+  const nSteps = items.reduce((a,o) => a+o.steps.length, 0);
+  const hot = items.filter(o => !o.x.blocked && (o.x.ds==='overdue'||o.x.ds==='today')).length;
+  if (!items.length) return `<section class="psum"><div class="pshead"><span class="av">${esc(initial(p))}</span><div><b>${esc(p)}</b><small>ไม่มีงานค้าง 🎉</small></div></div></section>`;
+  return `<section class="psum">
+    <div class="pshead"><span class="av">${esc(initial(p))}</span>
+      <div><b>สิ่งที่ ${esc(p)} ต้องทำ</b><small>${nSteps} อย่าง · ${items.length} หัวข้อ${hot?` · <em>เร่ง ${hot}</em>`:''}</small></div>
+      <button class="mini" id="psCopy">คัดลอกส่ง LINE</button></div>
+    <ol class="pslist">${items.map(({x,steps}) => `<li class="${x.blocked?'blocked':x.ds}">
+      <div class="pst"><span>${esc(x.t.title)}</span><i>${esc(dueWord(x))}</i></div>
+      ${steps.map(s => `<div class="pss">${esc(s.text)}</div>`).join('')}</li>`).join('')}</ol></section>`;
+}
+function personSumText(p){
+  const items = personItems(p, derive().filter(x => !x.done));
+  if (!items.length) return p+' ไม่มีงานค้างครับ';
+  return `งานของ ${p} (${items.reduce((a,o)=>a+o.steps.length,0)} อย่าง)\n` + items.map(({x,steps}, i) => {
+    const d = dueWord(x); return `\n${i+1}. ${x.t.title}${d?' — '+d:''}\n` + steps.map(s => '   - '+s.text).join('\n'); }).join('\n');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#psCopy') || !S.person) return;
+  const v = personSumText(S.person);
+  (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(()=>toast('คัดลอกแล้ว ✓ วางใน LINE ได้เลย'),
+    ()=>{ const i=document.createElement('textarea'); i.value=v; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); toast('คัดลอกแล้ว ✓'); });
+});
 
 function cardHtml(x){
   const t = x.t;
