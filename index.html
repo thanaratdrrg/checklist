@@ -602,6 +602,7 @@
     --sh:inset 0 1px 0 rgba(255,255,255,.85), 0 1px 2px rgba(40,50,70,.05), 0 10px 26px rgba(40,50,70,.07)}
   .chips{padding:10px 10px 14px;margin:-10px -10px -14px}
   @media (min-width:1100px){.chips{overflow:visible;flex-wrap:wrap;justify-content:flex-end;margin:0;padding:0}}
+  @media (hover:hover) and (pointer:fine){.chips{overflow:visible;flex-wrap:wrap;justify-content:flex-end;margin:0;padding:0;row-gap:6px}}
   .chip,.slist button,.mini,.qmore,.btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 2px 6px rgba(40,50,70,.07)}
   .chip.on{border-color:transparent}
   .stat,.icon-btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 4px 14px rgba(40,50,70,.07)}
@@ -609,6 +610,21 @@
   .bcol{border:1px dashed rgba(150,160,172,.28)}
   .chip{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(255,255,255,.62);border:1px solid rgba(150,160,172,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)!important}
   .chip.on{background:var(--graphite);border-color:transparent!important;box-shadow:0 3px 8px rgba(20,24,30,.18)!important}
+
+  /* ทีม + ประวัติ */
+  .lastby{display:block;border:0;background:none;padding:6px 2px 0;margin:0;font:inherit;font-size:11.5px;color:var(--sub);cursor:pointer;text-align:left}
+  .lastby:hover{color:var(--teal)}
+  .team{display:flex;flex-direction:column;gap:8px}
+  .tm{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.55);border:1px solid rgba(150,160,172,.18)}
+  .tm .nm{flex:1;min-width:0;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tm .nm small{display:block;font-weight:400;font-size:11.5px;color:var(--sub)}
+  .tm .btn{padding:7px 10px;font-size:12.5px}
+  .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--graphite,#23272d);color:#fff;font-size:12px;font-weight:600;flex:none}
+  .hist{max-height:60vh;overflow:auto}
+  .hday{font:500 10.5px var(--mono,monospace);letter-spacing:.12em;color:#9aa2ac;margin:12px 2px 6px;text-transform:uppercase}
+  .hrow{display:flex;gap:10px;align-items:flex-start;padding:8px 2px;border-bottom:1px solid rgba(150,160,172,.15)}
+  .hrow .hx{flex:1;min-width:0;font-size:13.5px;line-height:1.45}
+  .hrow .hx small{display:block;color:var(--sub);font-size:11px;margin-top:2px}
   #setup{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:24px}
   #setup .sbox{width:min(380px,100%);background:var(--card);border-radius:28px;padding:24px;box-shadow:var(--sh);text-align:center}
   #setup .slogo img{width:72px;height:72px;border-radius:18px}
@@ -878,6 +894,7 @@ function cardHtml(x){
     <ul class="steps">${steps}</ul>
     ${t.notes && S.notesOpen[t.id] ? `<div class="notes">${esc(t.notes)}</div>` : ''}
     ${x.done ? '' : `<label class="upd">${IC.pen}<input class="add-step" data-addstep="${t.id}" placeholder="พิมพ์อัปเดต เช่น ช่างเลื่อน 2 วัน" enterkeyhint="send"></label>`}
+    ${lastByHtml(t.id)}
   </article>`;
 }
 function isoToYmd(iso){ const d=new Date(Date.parse(iso)+7*3600000); return d.toISOString().slice(0,10); }
@@ -1038,6 +1055,7 @@ function topicMenu(id){
     <button class="btn primary" id="mSave" style="width:100%;margin-bottom:12px">บันทึก</button>
     <div class="menu">
       ${t.status==='done' ? `<button id="mReopen">↩️ เปิดงานนี้ใหม่</button>` : `<button id="mDone">✅ ทำเครื่องหมายว่าเสร็จทั้งหัวข้อ</button>`}
+      <button id="mHist">🕘 ประวัติการแก้ไขหัวข้อนี้</button>
       <button class="red" id="mDel">🗑 ลบหัวข้อนี้</button>
       <button id="mClose">ปิด</button>
     </div>`);
@@ -1047,38 +1065,109 @@ function topicMenu(id){
   if ($('mReopen')) $('mReopen').onclick = () => { closeSheet(); run('updateTopic', id, {status:'active'}); };
   $('mDel').onclick = () => { if(!confirm('ลบ “'+t.title+'” และขั้นตอนทั้งหมด?')) return; closeSheet(); S.data.topics=S.data.topics.filter(x=>x.id!==id); render(); run('deleteTopic', id); };
   $('mClose').onclick = closeSheet;
+  $('mHist').onclick = () => historySheet({ ref: id, title: t.title });
 }
 
 /* ================= settings ================= */
-$('btnSettings').onclick = () => {
+$('btnSettings').onclick = () => settingsSheet();
+function settingsSheet(){
   const st = S.data ? S.data.settings : {};
+  const tm = st.team || { me: { name: '', owner: true } }, me = tm.me, own = me.owner;
+  const users = tm.users || [];
   openSheet(`<h2>⚙️ ตั้งค่า</h2>
-    ${st.appLink ? `<div class="field"><label>📲 ลิงก์ติดตั้งแอป</label>
+    <div class="field"><label>👤 ชื่อของคุณในแอป</label>
+      ${own ? `<div class="pv-row"><input id="sMyName" value="${esc(me.name)}" style="flex:1;min-width:0"><button class="btn" id="sMyNameSave">บันทึก</button></div>
+      <div class="hint">ชื่อนี้จะขึ้นในประวัติว่าใครแก้อะไร</div>` : `<div class="pv-row"><b>${esc(me.name)}</b></div><div class="hint">ทุกครั้งที่แก้ไข ระบบจะบันทึกชื่อนี้ไว้ในประวัติ</div>`}</div>
+
+    <div class="field"><label>🔔 แจ้งเตือนของฉัน (แอป Bark) ${st.hasBark ? '<span style="color:var(--teal)">✓ เชื่อมแล้ว</span>' : '<span style="color:var(--red)">· ยังไม่ได้เชื่อม</span>'}</label>
+      <div class="pv-row"><input id="sBark" placeholder="${st.hasBark ? 'ใส่ใหม่ถ้าต้องการเปลี่ยน' : 'วางคีย์ Bark หรือลิงก์ api.day.app/…'}" autocomplete="off" style="flex:1;min-width:0"><button class="btn" id="sBarkSave">บันทึก</button></div>
+      <div class="hint">ติดตั้งแอป Bark ใน iPhone → เปิดแอป → คัดลอกลิงก์ตัวอย่าง (https://api.day.app/…) มาวางที่นี่ · สรุปงานส่งทุกวัน ${esc(st.morning||'08:00')} และ ${esc(st.evening||'16:30')} น.</div>
+      <div class="pv-row" style="margin-top:8px"><button class="btn" id="sBarkTest">ส่งทดสอบถึงฉัน</button></div></div>
+
+    <button class="btn" id="sHist" style="width:100%;margin-bottom:14px">🕘 ดูประวัติการแก้ไขทั้งหมด</button>
+
+    ${own ? `
+    <div class="field"><label>👥 คนในออฟฟิศที่ใช้แอปได้ (${users.length})</label>
+      <div class="team">${users.map(u => `<div class="tm"><span class="av">${esc(initial(u.name))}</span><span class="nm">${esc(u.name)}<small>${u.hasBark ? 'Bark ✓' : 'ยังไม่ตั้ง Bark'}</small></span>
+        <button class="btn" data-ucopy="${esc(u.link)}">คัดลอกลิงก์</button><button class="btn ghost" data-udel="${u.id}" data-uname="${esc(u.name)}">ยกเลิก</button></div>`).join('') || '<div class="hint">ยังไม่มี — เพิ่มชื่อด้านล่าง</div>'}</div>
+      <div class="pv-row" style="margin-top:8px"><input id="sNewUser" placeholder="ชื่อ เช่น พี่เอ ฝ่ายจัดซื้อ" style="flex:1;min-width:0"><button class="btn primary" id="sAddUser">เพิ่มคน</button></div>
+      <div class="hint">เพิ่มแล้วกด "คัดลอกลิงก์" ส่งให้คนนั้นทางไลน์ · เปิดลิงก์ครั้งเดียวก็ใช้ได้ · ทุกคนแก้ไขได้ และระบบบันทึกว่าใครแก้อะไร · กด "ยกเลิก" เพื่อตัดสิทธิ์ทันที</div></div>
+
+    ${st.appLink ? `<div class="field"><label>📲 ลิงก์ติดตั้งแอปของคุณ (เจ้าของ)</label>
       <div class="pv-row"><input id="sAppLink" readonly value="${esc(st.appLink)}" style="flex:1;min-width:0"><button class="btn" id="sAppCopy">คัดลอก</button></div>
-      <div class="hint">เปิดลิงก์นี้ในมือถือ/คอมเครื่องใหม่ครั้งเดียว · ห้ามส่งให้คนอื่น (ใช้แทนรหัสผ่าน)</div></div>` : ''}
-    <div class="field"><label>🔔 แจ้งเตือน ${st.hasBark ? '<span style="color:var(--ink)">· แอป Bark ✓ เชื่อมแล้ว</span>' : '<span style="color:var(--red)">· ยังไม่ได้เชื่อมแอป Bark</span>'}</label>
-      <div class="hint">ทุกวัน ${esc(st.morning)} และ ${esc(st.evening)} น. · สรุปสัปดาห์ทุกวันอาทิตย์ ${esc(st.weekly||'18:00')} น. · ถ้า Bark ส่งไม่ได้ จะส่งเข้า Gmail แทน</div></div>
-    <div class="pv-row" style="flex-wrap:wrap;margin-bottom:14px">
-      <button class="btn" data-send="testNotify">ส่งทดสอบ</button>
-      <button class="btn" data-send="sendMorningNow">☀️ ส่งสรุปเช้าตอนนี้</button>
-      <button class="btn" data-send="sendEveningNow">🌆 ส่งสรุปเย็นตอนนี้</button>
-      <button class="btn" data-send="sendWeeklyNow">🗓 ส่งสรุปสัปดาห์ตอนนี้</button>
-      <button class="btn" data-send="syncCalendarNow">📅 ซิงค์ปฏิทิน</button></div>
-    <div class="hint" style="margin:-6px 0 14px">📱 วิดเจ็ตอ่านงานจากปฏิทิน "แผนงานหน้างาน" ในไอโฟน (แอป Scriptable)</div>
-    <div class="field"><label>✨ คีย์ Gemini ${st.hasGemini ? '<span style="color:var(--accent)">✓ ตั้งไว้แล้ว</span>' : '<span style="color:var(--red)">ยังไม่ได้ตั้ง</span>'}</label>
-      <input id="sKey" type="password" placeholder="${st.hasGemini ? 'ใส่ใหม่ถ้าต้องการเปลี่ยน' : 'วางคีย์ที่ขึ้นต้นด้วย AIza…'}" autocomplete="off">
-      <div class="hint">ขอคีย์ฟรีที่ aistudio.google.com → Get API key</div></div>
-    <div class="field"><label>รุ่น Gemini</label><input id="sModel" value="${esc(st.geminiModel||'')}">
-      <div class="hint">ปกติไม่ต้องแก้ ถ้า Google เปลี่ยนชื่อรุ่น ค่อยมาแก้ตรงนี้</div></div>
-    <button class="btn primary" id="sSave" style="width:100%;margin-bottom:10px">บันทึกการตั้งค่า</button>
-    ${st.sheetUrl ? `<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px" href="${esc(st.sheetUrl)}" target="_blank">📊 เปิด Google Sheet ข้อมูล</a>` : ''}
+      <div class="hint">ใช้เฉพาะเครื่องของคุณ · ห้ามส่งให้คนอื่น (คนอื่นให้ใช้ลิงก์จากรายชื่อด้านบน)</div></div>` : ''}
+
+    <div class="field"><label>📣 ส่งสรุปตอนนี้ (ส่งถึงทุกคนที่ตั้ง Bark)</label>
+    <div class="pv-row" style="flex-wrap:wrap">
+      <button class="btn" data-send="sendMorningNow">☀️ สรุปเช้า</button>
+      <button class="btn" data-send="sendEveningNow">🌆 สรุปเย็น</button>
+      <button class="btn" data-send="sendWeeklyNow">🗓 สรุปสัปดาห์</button>
+      <button class="btn" data-send="syncCalendarNow">📅 ซิงค์ปฏิทิน</button></div></div>
+
+    <div class="field"><label>✨ คีย์ Gemini ${st.hasGemini ? '<span style="color:var(--teal)">✓ ตั้งไว้แล้ว</span>' : '<span style="color:var(--red)">ยังไม่ได้ตั้ง</span>'}</label>
+      <input id="sKey" type="password" placeholder="${st.hasGemini ? 'ใส่ใหม่ถ้าต้องการเปลี่ยน' : 'วางคีย์ที่ขึ้นต้นด้วย AIza…'}" autocomplete="off"></div>
+    <div class="field"><label>รุ่น Gemini</label><input id="sModel" value="${esc(st.geminiModel||'')}"></div>
+    <button class="btn primary" id="sSave" style="width:100%;margin-bottom:10px">บันทึก Gemini</button>
+    ${st.sheetUrl ? `<a class="btn" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px" href="${esc(st.sheetUrl)}" target="_blank">📊 เปิด Google Sheet ข้อมูล</a>` : ''}` : ''}
     <button class="btn ghost" id="sClose" style="width:100%">ปิด</button>`);
-  $('sheet').querySelectorAll('[data-send]').forEach(b => b.onclick = async () => {
+  const sh = $('sheet');
+  sh.querySelectorAll('[data-send]').forEach(b => b.onclick = async () => {
     b.disabled = true; try{ const r = await call(b.dataset.send); toast(r===false ? 'ส่งไม่สำเร็จ' : (typeof r==='string'? r : 'ส่งแล้ว ✓')); }catch(e){ fail(e); } b.disabled=false; });
-  if ($('sAppCopy')) $('sAppCopy').onclick = () => { const i=$('sAppLink'); i.select(); (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(()=>toast('คัดลอกแล้ว ✓'), ()=>{ document.execCommand('copy'); toast('คัดลอกแล้ว ✓'); }); };
-  $('sSave').onclick = async () => { const d = await run('saveSettings', {geminiKey:$('sKey').value, geminiModel:$('sModel').value}); if(d){ toast('บันทึกแล้ว ✓'); closeSheet(); } };
+  const copy = v => (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(()=>toast('คัดลอกแล้ว ✓ ส่งให้ได้เลย'), ()=>{ const i=document.createElement('textarea'); i.value=v; document.body.appendChild(i); i.select(); document.execCommand('copy'); i.remove(); toast('คัดลอกแล้ว ✓'); });
+  if ($('sAppCopy')) $('sAppCopy').onclick = () => copy($('sAppLink').value);
+  sh.querySelectorAll('[data-ucopy]').forEach(b => b.onclick = () => copy(b.dataset.ucopy));
+  sh.querySelectorAll('[data-udel]').forEach(b => b.onclick = async () => {
+    if (!confirm('ยกเลิกสิทธิ์ ' + b.dataset.uname + '? ลิงก์ของคนนี้จะใช้ไม่ได้ทันที')) return;
+    const d = await run('removeUser', b.dataset.udel); if (d){ toast('ยกเลิกแล้ว'); settingsSheet(); } });
+  if ($('sAddUser')) $('sAddUser').onclick = async () => {
+    const n = $('sNewUser').value.trim(); if (!n){ $('sNewUser').focus(); return; }
+    const d = await run('addUser', n); if (d){ toast('เพิ่ม ' + n + ' แล้ว — กดคัดลอกลิงก์ส่งให้'); settingsSheet(); } };
+  if ($('sMyNameSave')) $('sMyNameSave').onclick = async () => { const d = await run('setOwnerName', $('sMyName').value); if (d) toast('บันทึกแล้ว ✓'); };
+  $('sBarkSave').onclick = async () => { const v = $('sBark').value.trim(); if (!v){ $('sBark').focus(); return; } const d = await run('setMyBark', v); if (d){ toast('บันทึกแล้ว ✓ ลองกดส่งทดสอบ'); settingsSheet(); } };
+  $('sBarkTest').onclick = async e => { e.target.disabled = true; try{ toast(await call('testMyBark')); }catch(err){ fail(err); } e.target.disabled = false; };
+  $('sHist').onclick = () => historySheet({});
+  if ($('sSave')) $('sSave').onclick = async () => { const d = await run('saveSettings', {geminiKey:$('sKey').value, geminiModel:$('sModel').value}); if(d){ toast('บันทึกแล้ว ✓'); closeSheet(); } };
   $('sClose').onclick = closeSheet;
-};
+}
+
+/* ================= ประวัติการแก้ไข ================= */
+function initial(n){ n = String(n||'').trim(); const b = n.replace(/^(คุณ|ช่าง|พี่|น้อง|เฮีย|เจ๊)\s*/,'') || n; return (b.replace(/^[เแโใไ]/,'').slice(0,1) || b.slice(0,1)).toUpperCase(); }
+function ago(iso){
+  const m = Math.round((Date.now() - Date.parse(iso)) / 60000);
+  if (m < 1) return 'เมื่อกี้'; if (m < 60) return m + ' นาทีก่อน';
+  const h = Math.round(m / 60); if (h < 24) return h + ' ชม.ก่อน';
+  const d = Math.round(h / 24); return d < 7 ? d + ' วันก่อน' : thai(isoToYmd(iso));
+}
+function hhmm(iso){ const d = new Date(Date.parse(iso) + 7*3600000); return d.toISOString().slice(11,16); }
+function acts(){ return (S.data && S.data.activity) || []; }
+function lastByHtml(id){
+  const a = acts().find(x => x.ref === id);
+  return a ? `<button class="lastby" data-hist="${id}">✎ ${esc(a.who)} · ${ago(a.time)}</button>` : '';
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-histall]')) historySheet({}); });
+document.addEventListener('click', e => { const el = e.target.closest('[data-hist]'); if (!el) return;
+  const t = S.data.topics.find(x => x.id === el.dataset.hist); historySheet({ ref: el.dataset.hist, title: t ? t.title : '' }); });
+function historySheet(o){
+  o = o || {};
+  const all = acts().filter(a => !o.ref || a.ref === o.ref);
+  const people = [...new Set(all.map(a => a.who))];
+  const draw = who => {
+    const list = all.filter(a => !who || a.who === who);
+    let day = '', html = '';
+    list.forEach(a => { const d = isoToYmd(a.time);
+      if (d !== day){ day = d; html += `<div class="hday">${d === S.data.today ? 'วันนี้' : thai(d, true)}</div>`; }
+      html += `<div class="hrow"><span class="av">${esc(initial(a.who))}</span><div class="hx"><b>${esc(a.who)}</b> ${esc(a.text)}<small>${hhmm(a.time)} น.</small></div></div>`; });
+    $('histList').innerHTML = html || '<div class="hint" style="padding:16px 0">ยังไม่มีประวัติ — เริ่มบันทึกตั้งแต่ตอนนี้เป็นต้นไป</div>';
+    $('sheet').querySelectorAll('[data-hwho]').forEach(b => b.classList.toggle('on', b.dataset.hwho === (who||'')));
+  };
+  openSheet(`<h2>🕘 ประวัติการแก้ไข</h2>${o.title ? `<div class="hint" style="margin:-6px 0 10px">${esc(o.title)}</div>` : ''}
+    ${people.length > 1 ? `<div class="chips" style="margin-bottom:10px"><button class="chip on" data-hwho="">ทุกคน</button>${people.map(p => `<button class="chip" data-hwho="${esc(p)}">${esc(p)}</button>`).join('')}</div>` : ''}
+    <div id="histList" class="hist"></div>
+    <button class="btn ghost" id="hClose" style="width:100%;margin-top:12px">ปิด</button>`);
+  $('sheet').querySelectorAll('[data-hwho]').forEach(b => b.onclick = () => draw(b.dataset.hwho));
+  $('hClose').onclick = closeSheet;
+  draw('');
+}
 $('btnRefresh').onclick = () => { toast('กำลังรีเฟรช…'); load(); };
 
 /* ================= composer ================= */
@@ -1532,11 +1621,13 @@ function renderDesk(D, asks){
     <button class="sv ${S.tab==='plan'?'on':''}" data-tab="plan">${IC.cal}<span>แผนงาน (แกนต์)</span><em class="${asks.length?'hot':''}">${asks.length?asks.length+' ถาม':''}</em></button>
     <button class="sv" data-people="1">${IC.person}<span>ผู้ประสานงาน</span><em>${people.length}</em></button>
     <button class="sv ${onDone?'on':''}" data-deskview="done">${IC.check}<span>เสร็จแล้ว</span><em>${all.length-act.length}</em></button>
+    <button class="sv" data-histall="1">${IC.pen}<span>ประวัติการแก้ไข</span><em>${acts().filter(x=>isoToYmd(x.time)===today).length||''}</em></button>
     <div class="slab">โปรเจกต์</div>
     ${projects().map(pr => `<button class="sv ${pr.id===cur?'on':''}" data-proj="${pr.id}"><span>🏠 ${esc(pr.name)}</span><em>${projPct(pr.id)}</em></button>`).join('')}
     ${projects().length>1 ? `<button class="sv ${!cur?'on':''}" data-proj="all"><span>ทุกโปรเจกต์</span></button>` : ''}
     <button class="sv" data-projnew="1"><span style="color:var(--sub)">+ โปรเจกต์ใหม่</span></button>
     <div class="slab">สถานะ</div>
+    <div class="sstat"><i class="ok"></i>ใช้งานในชื่อ ${esc(((st.team||{}).me||{}).name||'')}</div>
     <div class="sstat"><i class="${st.hasBark?'ok':''}"></i>แจ้งเตือน Bark ${st.hasBark?'✓':'— ยังไม่เชื่อม'}</div>
     <div class="sstat"><i class="ok"></i>สรุปเช้า 08:00 · เย็น 16:30</div>
     <div class="skeys"><kbd>Ctrl K</kbd>พิมพ์งานใหม่<br><kbd>Ctrl V</kbd>วางรูปแคปแชท<br><kbd>1</kbd><kbd>2</kbd>สลับบอร์ด / แผนงาน</div>`;
